@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AsyncTrigger extends SlOperation {
-	private String handler;
+	private String handlerId;
 	private String content;
 	private Map<String, String> oldMeta;
 	private Map<String, String> newMeta;
 	private boolean flag;
 	public AsyncTrigger(String slID, String h, String c) {
 		super(slID);
-		this.setHandler(h);
+		this.setHandlerId(h);
 		this.setContent(c);
 		// TODO Auto-generated constructor stub
 	}
@@ -21,11 +21,11 @@ public class AsyncTrigger extends SlOperation {
 	public void setContent(String content) {
 		this.content = content;
 	}
-	public String getHandler() {
-		return handler;
+	public String getHandlerId() {
+		return handlerId;
 	}
-	public void setHandler(String handler) {
-		this.handler = handler;
+	public void setHandlerId(String handlerId) {
+		this.handlerId = handlerId;
 	}
 	private Map<String, String> String2Metadata(){
 		Map m = new HashMap();
@@ -57,4 +57,5 @@ public class AsyncTrigger extends SlOperation {
 	public void setFlag(boolean flag) {
 		this.flag = flag;
 	}
+	
 }

@@ -8,7 +8,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import fakeStorletInterface.Storlet;
+import eu.visioncloud.ExampleStorlet;
+import eu.visioncloud.storlet.common.Storlet;
+
 import se.sics.kompics.Init;
 import util.JarInJarClassLoader;
 
@@ -20,7 +22,7 @@ public class StorletInit extends Init {
 	//private String storletName;
 	
 	public StorletInit(){
-		//storletType = getStorletType(url, storletName);//url and name form jason body
+		
 	}
 	
 	public Class<? extends Storlet> getStorletType() {

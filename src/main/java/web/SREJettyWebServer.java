@@ -95,7 +95,6 @@ public final class SREJettyWebServer extends ComponentDefinition {
 						+ "This is the JettyWebServer Kompics component.<br>"
 						+ "Please initialize me with a proper home page.";
 			}
-
 			Server server = new Server(config.getPort());
 			// server.setStopAtShutdown(true);
 			QueuedThreadPool qtp = new QueuedThreadPool();
@@ -103,12 +102,10 @@ public final class SREJettyWebServer extends ComponentDefinition {
 			qtp.setMaxThreads(config.getMaxThreads());
 			qtp.setDaemon(true);
 			server.setThreadPool(qtp);
-
 			Connector connector = new SelectChannelConnector();
 			connector.setHost(config.getIp().getCanonicalHostName());
 			connector.setPort(config.getPort());
 			server.setConnectors(new Connector[] { connector });
-
 			try {
 				org.mortbay.jetty.Handler webHandler = new SREJettyHandler(thisWS);
 				server.setHandler(webHandler);
@@ -145,26 +142,19 @@ public final class SREJettyWebServer extends ComponentDefinition {
 			HttpServletResponse response) throws IOException {
 		logger.debug("Handling request {} in thread {}", target, Thread
 				.currentThread());
-		//System.out.println("target: "+target);
+		
 		String[] args = target.split("/");
 
 		String slID = null;
 		String handler = "";
-		if (args.length == 3) {
-			try {
-				slID = args[1];
-				handler = args[2];
-			} catch (NumberFormatException e) {
-				slID = null;
-			}
+		String activationId = "";
+		if (args.length >= 3) {
+			System.out.println("target: "+args[2]);
+			slID = args[2];
 		}
-		if (args.length == 2) {
-			try {
-				slID = args[1];
-				handler = "";
-			} catch (NumberFormatException e) {
-				slID = null;
-			}
+		if (args.length == 5) {
+			handler = args[3];
+			activationId = args[4];
 		}
 		// System.err.println("TAGET:\"" + target + "\", COM=" + command +
 		// "DEST="
@@ -173,8 +163,8 @@ public final class SREJettyWebServer extends ComponentDefinition {
 		
 		if (slID == null) {
 			// render home page
-			response.getWriter().println(homePage);
-			response.flushBuffer();
+			//response.getWriter().println(homePage);
+			//response.flushBuffer();
 			return;
 		}
 

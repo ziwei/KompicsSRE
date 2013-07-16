@@ -12,14 +12,21 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+	<classpathentry kind="lib" path="/home/ziwei/Desktop/cciclient-0.0.1-20121002.152357-1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/programming-environment"/>
+	<classpathentry kind="lib" path="/home/ziwei/.m2/repository/eu/visioncloud/programming-environment/0.1-SNAPSHOT/programming-environment-0.1-SNAPSHOT.jar">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="eu.visioncloud"/>
+			<attribute name="maven.artifactId" value="programming-environment"/>
+			<attribute name="maven.version" value="0.1-SNAPSHOT"/>
+			<attribute name="maven.scope" value="compile"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>

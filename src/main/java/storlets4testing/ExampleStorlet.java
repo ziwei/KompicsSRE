@@ -8,16 +8,19 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import fakeStorletInterface.Storlet;
+import eu.visioncloud.storlet.common.Storlet;
+import eu.visioncloud.storlet.common.StorletException;
+import eu.visioncloud.storlet.common.TriggerHandler;
 
-//import eu.visioncloud.cci.client.ClientInterface;
-//import eu.visioncloud.cci.client.ContentCentricException;
-//import eu.visioncloud.storlet.common.EventModel;
-//import eu.visioncloud.storlet.common.Storlet;
-//import eu.visioncloud.storlet.common.StorletException;
-//import eu.visioncloud.storlet.common.SyncOutputStream;
-//import eu.visioncloud.storlet.common.TriggerHandler;
-//import eu.visioncloud.storlet.common.Utils;
+
+import eu.visioncloud.cci.client.ClientInterface;
+import eu.visioncloud.cci.client.ContentCentricException;
+import eu.visioncloud.storlet.common.EventModel;
+import eu.visioncloud.storlet.common.Storlet;
+import eu.visioncloud.storlet.common.StorletException;
+import eu.visioncloud.storlet.common.SyncOutputStream;
+import eu.visioncloud.storlet.common.TriggerHandler;
+import eu.visioncloud.storlet.common.Utils;
 
 public class ExampleStorlet extends Storlet {
 
