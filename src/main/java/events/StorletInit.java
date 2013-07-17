@@ -3,6 +3,7 @@ package events;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -18,11 +19,16 @@ public class StorletInit extends Init {
 	private Class<? extends Storlet> storletType;
 	private File workingDir;
 	private String contentCentricUrl;
+	private Socket socket;
 	//private URL url;
 	//private String storletName;
 	
 	public StorletInit(){
 		
+	}
+	
+	public StorletInit(Socket socket){
+		this.setSocket(socket);
 	}
 	
 	public Class<? extends Storlet> getStorletType() {
@@ -47,6 +53,14 @@ public class StorletInit extends Init {
 
 	public void setContentCentricUrl(String contentCentricUrl) {
 		this.contentCentricUrl = contentCentricUrl;
+	}
+
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public void setSocket(Socket socket) {
+		this.socket = socket;
 	}
 
 }

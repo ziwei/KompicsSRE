@@ -1,5 +1,6 @@
 package vision.kompics;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -22,15 +23,11 @@ public class MainContainer extends ComponentDefinition {
 		Kompics.createAndStart(MainContainer.class, 8);
 	}
 	
-	public MainContainer() throws UnknownHostException {
+	public MainContainer() throws IOException {
 		Component webServer = create(SREJettyWebServer.class);
-		//Configuration config = new Configuration();
 		Component sre = create(SREComponent.class);
-		
-		JettyWebServerConfiguration jwsc = new JettyWebServerConfiguration(InetAddress.getLocalHost(),8080,1,2,"<h2>This is my page</h2>");
-		JettyWebServerInit init = new JettyWebServerInit(jwsc);
+		JettyWebServerInit init = new JettyWebServerInit(JettyWebServerConfiguration.load("wsconfig"));
 		connect(sre.getPositive(SlRequest.class), webServer.getNegative(SlRequest.class));
 		trigger(init, webServer.getControl());
-		System.out.println("MyFirst Kompics App");
 	}
 }

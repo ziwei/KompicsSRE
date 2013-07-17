@@ -1,0 +1,5 @@
+server.ip localhost
+server.port 8080
+request.timeout 1000
+threads.max 4
+home.page <h2>This is my page</h2>

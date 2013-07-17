@@ -12,7 +12,6 @@ import eu.visioncloud.storlet.common.Storlet;
 import eu.visioncloud.storlet.common.StorletException;
 import eu.visioncloud.storlet.common.TriggerHandler;
 
-
 import eu.visioncloud.cci.client.ClientInterface;
 import eu.visioncloud.cci.client.ContentCentricException;
 import eu.visioncloud.storlet.common.EventModel;
@@ -25,43 +24,46 @@ import eu.visioncloud.storlet.common.Utils;
 public class ExampleStorlet extends Storlet {
 
 	public static void main(String[] args) {
-		
+
 		try {
-			Storlet.createStorlet(ExampleStorlet.class, new File("/tmp/"), "127.0.0.1");
+			Storlet.createStorlet(ExampleStorlet.class, new File("/tmp/"),
+					"127.0.0.1");
 		} catch (StorletException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		System.out.println("hello world");
+		}
+		System.out.println("hello world");
 	}
-	
+
 	@Override
 	protected Set<TriggerHandler> getTriggerHandlers() {
 
 		// create a new handler called "update"
-		TriggerHandler handler = new TriggerHandler(this, "update") {
+		TriggerHandler handler = new TriggerHandler(this, "handlerE") {
 
 			@Override
 			public void onExecute(EventModel event, Logger logger,
 					ClientInterface storageClient) throws StorletException {
-				try {
-					// get data from the storlet.properties
-					String myKey = getProperty("myKey");
-					String myKeyValue = getProperty("myKeyValue");
+				// try {
+				// get data from the storlet.properties
+				String myKey = getProperty("myKey");
+				String myKeyValue = getProperty("myKeyValue");
 
-					// write to the logger
-					logger.info(myKey);
-					logger.info(myKeyValue);
+				// write to the logger
+				logger.info(myKey);
+				logger.info(myKeyValue);
 
-					// create new object
-					HashMap<String, String> metadata = new HashMap<String, String>();
-					metadata.put(myKey, myKeyValue);
-					storageClient.createObjectWithMetadata(
-							event.getTenantName(), event.getContainerName(),
-							event.getObjectName() + "-UpdatedCopy",
-							"Hello World From An Object", metadata);
-				} catch (ContentCentricException e) {
-					throw new StorletException(e);
-				}
+				// create new object
+				HashMap<String, String> metadata = new HashMap<String, String>();
+				metadata.put(myKey, myKeyValue);
+				System.out.println("ExampleStorlet async exec");
+				// storageClient.createObjectWithMetadata(
+				// event.getTenantName(), event.getContainerName(),
+				// event.getObjectName() + "-UpdatedCopy",
+				// "Hello World From An Object", metadata);
+				// } catch (ContentCentricException e) {
+				// throw new StorletException(e);
+				// }
 			}
 		};
 
@@ -110,6 +112,7 @@ public class ExampleStorlet extends Storlet {
 			// close the stream, if you forget the SRE will close it
 			os.close();
 			logger.info("ExampleStorlet closed stream");
+			System.out.println("ExampleStorlet Sync exec");
 		} catch (Exception e) {
 			logger.error("ExampleStorlet onGet failed", e);
 		}
