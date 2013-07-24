@@ -1,61 +1,41 @@
 package events;
 
-import java.util.HashMap;
-import java.util.Map;
+import eu.visioncloud.storlet.common.EventModel;
 
 public class AsyncTrigger extends SlOperation {
+	private String slID;
 	private String handlerId;
-	private String content;
-	private Map<String, String> oldMeta;
-	private Map<String, String> newMeta;
-	private boolean flag;
-	public AsyncTrigger(String slID, String h, String c) {
-		super(slID);
+	private EventModel em;
+
+	public AsyncTrigger(String slID, String h, EventModel e) {
+		this.setSlID(slID);
 		this.setHandlerId(h);
-		this.setContent(c);
+		this.setEventModel(e);
 		// TODO Auto-generated constructor stub
 	}
-	public String getContent() {
-		return content;
-	}
-	public void setContent(String content) {
-		this.content = content;
-	}
+
 	public String getHandlerId() {
 		return handlerId;
 	}
+
 	public void setHandlerId(String handlerId) {
 		this.handlerId = handlerId;
 	}
-	private Map<String, String> String2Metadata(){
-		Map m = new HashMap();
-		m.put(content, content);///////////////
-		return m;
+
+	public EventModel getEventModel() {
+		return em;
 	}
 
-
-	public Map<String, String> getOldMeta() {
-		return oldMeta;
+	public void setEventModel(EventModel em) {
+		this.em = em;
 	}
 
-	public void setOldMeta(Map<String, String> oldMeta) {
-		this.oldMeta = oldMeta;
+	public String getSlID() {
+		return slID;
 	}
 
-	public Map<String, String> getNewMeta() {
-		return newMeta;
+	public void setSlID(String slID) {
+		this.slID = slID;
 	}
 
-	public void setNewMeta(Map<String, String> newMeta) {
-		this.newMeta = newMeta;
-	}
-
-	public boolean getFlag() {
-		return flag;
-	}
-
-	public void setFlag(boolean flag) {
-		this.flag = flag;
-	}
-	
 }

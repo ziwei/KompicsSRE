@@ -29,7 +29,6 @@ import se.sics.kompics.address.Address;
 import se.sics.kompics.network.NetworkConfiguration;
 import se.sics.kompics.network.Transport;
 
-
 /**
  * The <code>Configuration</code> class.
  * 
@@ -46,7 +45,6 @@ public class Configuration {
 	}
 	int networkPort = 8081;
 	int webPort = 8080;
-
 
 	int webRequestTimeout = 5000;
 	int webThreads = 2;

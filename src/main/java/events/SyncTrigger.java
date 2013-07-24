@@ -1,16 +1,21 @@
 package events;
 
+import msgTypes.SyncSLActivation;
+
 public class SyncTrigger extends SlOperation {
-	private String content;
-	public SyncTrigger(String slID, String c) {
-		super(slID);
-		this.content = c;
+	private SyncSLActivation syncAct;
+
+	public SyncTrigger(SyncSLActivation syncAct) {
+		this.setSyncAct(syncAct);
 		// TODO Auto-generated constructor stub
 	}
-	public String getContent() {
-		return content;
+
+	public SyncSLActivation getSyncAct() {
+		return syncAct;
 	}
-	public void setContent(String content) {
-		this.content = content;
+
+	public void setSyncAct(SyncSLActivation syncAct) {
+		this.syncAct = syncAct;
 	}
+
 }

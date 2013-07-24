@@ -35,6 +35,8 @@ public class JarInJarClassLoader extends URLClassLoader {
 	// Index-Map
 	private Map<String, String> indexMap = new HashMap<String, String>();
 
+	private Map classes = new HashMap<String, Class<?>>();
+
 	public JarInJarClassLoader(URL url) {
 		super(new URL[] { url });
 		this.outerJarURL = url;
@@ -166,20 +168,20 @@ public class JarInJarClassLoader extends URLClassLoader {
 		String resPath = name.replaceAll("\\.", "/").concat(".class");
 		InputStream bCStream = getResourceAsStream(resPath);
 		if (bCStream != null) {
-			//System.out.println(resPath);
+			// System.out.println(resPath);
 			String nestedJarPath = this.indexMap.get(resPath);
 			// Package anlegen bzw. prüfen...
 			int index = name.lastIndexOf('.');
-			//System.out.println(index);
+			// System.out.println(index);
 			if (index != -1) {
 				String pkgname = name.substring(0, index);
-				//System.out.println(pkgname);
+				// System.out.println(pkgname);
 				Package packageID = this.getPackage(pkgname);
 				if (packageID == null) {
 					URL packageUrl = getResource(pkgname.replaceAll("\\.", "/")
 							.concat("/"));
 					Manifest manifest = this.manifests.get(nestedJarPath);
-					//System.out.println(manifest);
+					// System.out.println(manifest);
 					if (manifest != null) {
 						definePackage(pkgname, manifest, packageUrl);
 					} else {
@@ -201,6 +203,10 @@ public class JarInJarClassLoader extends URLClassLoader {
 				byteCode = byteArrayOutputStream.toByteArray();
 				Class clazz = defineClass(name, byteCode, 0, byteCode.length);
 				this.resolveClass(clazz);
+				
+				System.out.println("find class " +name);
+				classes.put(name, clazz);
+				//findAnonymous(name);
 				return clazz;
 			} catch (IOException e) {
 				throw new ClassNotFoundException(name, e.getCause());
@@ -219,14 +225,38 @@ public class JarInJarClassLoader extends URLClassLoader {
 	 */
 	@Override
 	public Class<?> findClass(String name) throws ClassNotFoundException {
+
 		try {
+			System.out.println("super default find class");
 			return super.findClass(name);
 		} catch (ClassNotFoundException e) {
 			try {
-				System.out.println(name);
+				// Thread.currentThread().setContextClassLoader(this);
+				System.out.println("internal find class");
 				return this.findClassInternal(name);
 			} catch (ClassNotFoundException ce) {
 				throw new ClassNotFoundException(name, ce.getCause());
+			}
+		}
+	}
+
+	private void findAnonymous(String name) throws ClassNotFoundException {
+		Class<?> ac = null;
+		int index = 1;
+		while (true) {
+			String tmpName = name+"$"+String.valueOf(index);
+			try {
+				System.out.println("tempName "+tmpName);
+				ac = this.findClassInternal(tmpName);
+			} catch (ClassNotFoundException ce) {
+				throw new ClassNotFoundException(name, ce.getCause());
+			}
+
+			if (null == ac)
+				break;
+			else {
+				classes.put(tmpName, ac);
+				++index;
 			}
 		}
 	}

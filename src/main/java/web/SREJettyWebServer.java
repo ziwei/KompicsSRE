@@ -21,12 +21,12 @@
 package web;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
 
+import msgTypes.SyncSLActivation;
+
+import org.codehaus.jackson.map.ObjectMapper;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -36,20 +36,18 @@ import org.slf4j.LoggerFactory;
 
 import porttypes.SlRequest;
 
+import eu.visioncloud.storlet.common.EventModel;
 import events.SlDelete;
-import events.SlOperation;
 import events.SyncTrigger;
 import events.AsyncTrigger;
 
 import se.sics.kompics.ComponentDefinition;
 import se.sics.kompics.Handler;
 import se.sics.kompics.Positive;
-import se.sics.kompics.Request;
 import se.sics.kompics.web.Web;
-import se.sics.kompics.web.WebRequest;
-import se.sics.kompics.web.WebResponse;
 import se.sics.kompics.web.jetty.JettyWebServerConfiguration;
 import se.sics.kompics.web.jetty.JettyWebServerInit;
+
 
 /**
  * The <code>JettyWebServer</code> class.
@@ -76,9 +74,8 @@ public final class SREJettyWebServer extends ComponentDefinition {
 	private Handler<JettyWebServerInit> handleInit = new Handler<JettyWebServerInit>() {
 		public void handle(JettyWebServerInit init) {
 			logger.debug("Handling init in thread {}", Thread.currentThread());
-
 			JettyWebServerConfiguration config = init.getConfiguration();
-			
+
 			homePage = config.getHomePage();
 			if (homePage == null) {
 				homePage = "<h1>Welcome!</h1>";
@@ -95,34 +92,39 @@ public final class SREJettyWebServer extends ComponentDefinition {
 			connector.setPort(config.getPort());
 			server.setConnectors(new Connector[] { connector });
 			try {
-				org.mortbay.jetty.Handler webHandler = new SREJettyHandler(thisWS);
+				org.mortbay.jetty.Handler webHandler = new SREJettyHandler(
+						thisWS);
 				server.setHandler(webHandler);
 				server.start();
-				//System.out.println("init succ");
+				// System.out.println("init succ");
 			} catch (Exception e) {
 				throw new RuntimeException(
 						"Cannot initialize the Jetty web server", e);
 			}
 		}
 	};
-
+	
+	
+	
+	
+	
 	void handleRequest(String target, org.mortbay.jetty.Request request,
 			HttpServletResponse response) throws IOException {
-		logger.debug("Handling request {} in thread {}", target, Thread
-				.currentThread());
+		logger.debug("Handling request {} in thread {}", target,
+				Thread.currentThread());
 		String[] args = target.split("/");
 		String slID = null;
 		String handler = "";
 		String activationId = "";
 		if (args.length >= 3) {
-			System.out.println("target: "+args[2]);
+			System.out.println("target: " + args[2]);
 			slID = args[2];
 		}
 		if (args.length == 5) {
 			handler = args[3];
 			activationId = args[4];
 		}
-		
+
 		if (slID == null) {
 			return;
 		}
@@ -132,15 +134,22 @@ public final class SREJettyWebServer extends ComponentDefinition {
 		String line;
 		String body = "";
 		String method = request.getMethod();
-		while ((line = request.getReader().readLine()) != null) { 
-		body = body.concat(line);
+		while ((line = request.getReader().readLine()) != null) {
+			body = body.concat(line);
 		}
-		if (method.equals("POST")&&!handler.equals(""))
-			trigger(new AsyncTrigger(slID, handler, body), sreWeb);
-		else if (method.equals("POST")&&slID.equals("SyncStorlet"))
-			trigger(new SyncTrigger(slID, body), sreWeb);
+		
+		ObjectMapper om = new ObjectMapper();
+		
+		if (method.equals("POST") && !handler.equals("")){
+			EventModel em = om.readValue(body, EventModel.class);
+			trigger(new AsyncTrigger(slID, handler, em), sreWeb);
+		}
+		else if (method.equals("POST") && slID.equals("syncStorlet")){
+			SyncSLActivation syncAct = om.readValue(body, SyncSLActivation.class);
+			trigger(new SyncTrigger(syncAct), sreWeb);
+		}
 		else if (method.equals("DELETE"))
 			trigger(new SlDelete(slID), sreWeb);
-		
+
 	}
 }

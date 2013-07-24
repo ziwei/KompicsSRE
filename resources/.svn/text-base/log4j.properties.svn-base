@@ -1,0 +1,25 @@
+log4j.rootLogger=DEBUG, stdout
+
+log4j.logger.org.apache=DEBUG, stdout
+log4j.additivity.org.apache=false
+log4j.appender.stdout=org.apache.log4j.FileAppender
+log4j.appender.stdout.File=/tmp/SREtmp/SRELogger.txt
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+#log4j.appender.stdout.layout.ConversionPattern=%d %-5p %c - %m%n
+log4j.appender.stdout.layout.ConversionPattern=%p [%t] %d{dd MMM yyyy HH:mm:ss,SSS} %m %n
+
+#log4j.logger.xdasLogger=DEBUG, jms
+#log4j.additivity.xdasLogger=false
+#log4j.appender.jms=org.apache.log4j.FileAppender
+#log4j.appender.jms.File=/tmp/NServLogger.txt
+#log4j.appender.jms.layout=org.apache.log4j.PatternLayout
+#log4j.appender.jms.layout.ConversionPattern=%m%n
+
+log4j.logger.xdasLogger=DEBUG, jms
+log4j.additivity.xdasLogger=false
+log4j.appender.jms=it.eng.compliance.log4j.JMSAppender
+log4j.appender.jms.url=tcp://10.0.1.214:61616
+#log4j.appender.jms.url=failover:(tcp://10.0.1.212:61616,tcp://10.0.2.212:61616,tcp://10.0.3.212:61616,tcp://10.0.1.215:61616,tcp://10.0.2.215:61616,tcp://10.0.3.215:61616)?randomize=true
+log4j.appender.jms.topicname=vision.xdas
+
+log4j.logger.it.eng.compliance=FATAL

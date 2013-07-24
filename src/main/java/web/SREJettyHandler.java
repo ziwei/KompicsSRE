@@ -26,10 +26,18 @@ import java.io.InputStream;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
+
+import eu.visioncloud.storlet.common.EventModel;
 
 import se.sics.kompics.web.Web;
 import se.sics.kompics.web.jetty.JettyWebServer;
@@ -50,9 +58,10 @@ final class SREJettyHandler extends AbstractHandler {
 
 	public SREJettyHandler(SREJettyWebServer webComponent) throws IOException {
 		super();
-		
+
 		this.webComponent = webComponent;
-		InputStream iconStrem = JettyWebServer.class//Custom web server has no icon
+		InputStream iconStrem = JettyWebServer.class// Custom web server has no
+													// icon
 				.getResourceAsStream("favicon.ico");
 
 		favicon = new byte[FAVICON_LENGTH];
@@ -61,6 +70,15 @@ final class SREJettyHandler extends AbstractHandler {
 			throw new RuntimeException("Cannot read icon file");
 	}
 
+	@POST
+	@Path("{SLID}/{HandlerID}/{ActivationID}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	void handlerAsync(@Context HttpServletRequest req, EventModel m,
+			@PathParam("SLID") String slID, @PathParam("HandlerID") String hID,  @PathParam("ActivationID") String activationID){
+		System.out.println("WTF, it is handled automatically");
+		//trigger(new AsyncTrigger(slID, hID, activationID), sreWeb);
+	}
+	
 	public void handle(String target, HttpServletRequest request,
 			HttpServletResponse response, int dispatch) throws IOException,
 			ServletException {
@@ -75,13 +93,14 @@ final class SREJettyHandler extends AbstractHandler {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.getOutputStream().write(favicon);
 		} else if (target.startsWith("/resource/")) {
-			String resource = target.substring(10); 
+			String resource = target.substring(10);
 			InputStream restream = Web.class.getResourceAsStream(resource);
 			byte[] b = new byte[4096];
 			int ret = 0;
 			do {
 				ret = restream.read(b);
-				if (ret <= 0) continue;
+				if (ret <= 0)
+					continue;
 				response.getOutputStream().write(b, 0, ret);
 			} while (ret > 0);
 			response.setStatus(HttpServletResponse.SC_OK);
