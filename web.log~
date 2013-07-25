@@ -1,0 +1,31 @@
+[14:20:01,607] INFO  {SREJettyWebServer} Handling init
+[14:20:04,737] INFO  {SREJettyWebServer} Handling an Async Trigger with activation id 1, slID sics.vision.ExampleStorlet, handler handlerE
+[14:21:57,187] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[14:22:02,880] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[14:24:06,810] INFO  {SREJettyWebServer} Handling an Async Trigger with activation id 1, slID sics.vision.ExampleStorlet, handler handlerE
+[14:24:44,260] INFO  {SREJettyWebServer} Handling init
+[14:25:18,347] INFO  {SREJettyWebServer} Handling init
+[14:25:26,673] INFO  {SREJettyWebServer} Handling request: /SRE/syncStorlet
+[14:26:51,971] INFO  {SREJettyWebServer} Handling init
+[14:26:53,861] INFO  {SREJettyWebServer} Handling request: syncStorlet
+[14:29:00,854] INFO  {SREJettyWebServer} Handling init
+[14:29:07,108] INFO  {SREJettyWebServer} Handling request: truetrue
+[14:32:01,020] INFO  {SREJettyWebServer} Handling init
+[14:33:19,627] INFO  {SREJettyWebServer} Handling init
+[14:33:37,754] INFO  {SREJettyWebServer} Handling request: truetrue
+[14:34:50,567] INFO  {SREJettyWebServer} Handling init
+[14:35:19,546] INFO  {SREJettyWebServer} Handling init
+[14:35:22,079] INFO  {SREJettyWebServer} Handling request: truetrue
+[14:36:26,091] INFO  {SREJettyWebServer} Handling init
+[14:36:28,587] INFO  {SREJettyWebServer} Handling request: truetrue
+[14:36:28,726] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[14:36:51,266] INFO  {SREJettyWebServer} Handling request: truetrue
+[14:36:51,266] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[14:36:53,033] INFO  {SREJettyWebServer} Handling request: truetrue
+[14:36:53,033] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[14:36:54,648] INFO  {SREJettyWebServer} Handling request: truetrue
+[14:36:54,649] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[14:36:55,154] INFO  {SREJettyWebServer} Handling request: truetrue
+[14:36:55,155] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[14:37:37,325] INFO  {SREJettyWebServer} Handling request: truefalse
+[14:37:37,325] INFO  {SREJettyWebServer} Handling an Async Trigger with activation id 1, slID sics.vision.ExampleStorlet, handler handlerE

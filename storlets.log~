@@ -1,0 +1,10 @@
+[16:30:11,880] INFO  {StorletWrapper} loading storlet with slID: sics.vision.ExampleStorlet
+[16:30:11,884] INFO  {StorletWrapper} -----[TEMP]Created work directory for sics.vision.ExampleStorlet at /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[]
+[16:30:11,914] INFO  {StorletWrapper} storlet class loaded: java.lang.Class
+[16:30:12,262] INFO  {StorletWrapper} storlet with slID: sics.vision.ExampleStorlet loaded
+[16:30:12,262] INFO  {StorletWrapper} Activation: 1. Async triggering storlet with slID: sics.vision.ExampleStorlet by handler: handlerE
+[16:30:12,263] INFO  {StorletWrapper} Activation: 1. Async triggering storlet with slID: sics.vision.ExampleStorlet by handler: handlerE completed
+[16:30:13,997] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet port: 8080 params: sics.vision.ExampleStorlet
+[16:30:14,007] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet completed

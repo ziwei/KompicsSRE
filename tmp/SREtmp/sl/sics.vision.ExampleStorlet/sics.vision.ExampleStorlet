@@ -1,2 +1,2 @@
-INFO - null
-INFO - null
+INFO - ExampleStorlet onGet params: Tenant=sics, Container=vision, Object=ExampleStorlet 
+INFO - ExampleStorlet closed stream

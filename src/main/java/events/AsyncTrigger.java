@@ -6,11 +6,13 @@ public class AsyncTrigger extends SlOperation {
 	private String slID;
 	private String handlerId;
 	private EventModel em;
+	private String actId;
 
-	public AsyncTrigger(String slID, String h, EventModel e) {
+	public AsyncTrigger(String slID, String handler, EventModel eventModel, String activationId) {
 		this.setSlID(slID);
-		this.setHandlerId(h);
-		this.setEventModel(e);
+		this.setHandlerId(handler);
+		this.setEventModel(eventModel);
+		this.setActId(activationId);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -36,6 +38,14 @@ public class AsyncTrigger extends SlOperation {
 
 	public void setSlID(String slID) {
 		this.slID = slID;
+	}
+
+	public String getActId() {
+		return actId;
+	}
+
+	public void setActId(String actId) {
+		this.actId = actId;
 	}
 
 }

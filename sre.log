@@ -1,0 +1,79 @@
+[16:29:56,947] INFO  {SREJettyWebServer} Handling init
+[16:30:11,833] INFO  {SREJettyWebServer} Handling an Async Trigger with activation id 1, slID sics.vision.ExampleStorlet, handler handlerE
+[16:30:11,877] INFO  {SREComponent} received an Async Trigger with slID: sics.vision.ExampleStorlet activatiinID: 1
+[16:30:11,877] INFO  {SREComponent} storlet not exists
+[16:30:11,879] INFO  {SREComponent} storlet wrapper created, storlet instantiating
+[16:30:11,879] INFO  {SREComponent} Async Trigger Event forwarded
+[16:30:13,986] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[16:30:13,995] INFO  {SREComponent} received an Sync Trigger for slName: sics.vision.ExampleStorlet
+[16:30:13,996] INFO  {SREComponent} storlet exists
+[16:30:13,996] INFO  {SREComponent} storlet loaded
+[16:30:13,996] INFO  {SREComponent} Sync Trigger Event forwarded
+[16:30:16,045] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[16:30:16,046] INFO  {SREComponent} received an Deletion Request for slID: sics.vision.ExampleStorlet
+[16:33:08,366] INFO  {SREJettyWebServer} Handling init
+[16:33:16,309] INFO  {SREJettyWebServer} Handling an Async Trigger with activation id 1, slID sics.vision.ExampleStorlet, handler handlerE
+[16:33:16,354] INFO  {SREComponent} received an Async Trigger with slID: sics.vision.ExampleStorlet activatiinID: 1
+[16:33:16,354] INFO  {SREComponent} storlet not exists
+[16:33:16,356] INFO  {SREComponent} storlet wrapper created, storlet instantiating
+[16:33:16,356] INFO  {SREComponent} Async Trigger Event forwarded
+[16:33:18,007] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[16:33:18,015] INFO  {SREComponent} received an Sync Trigger for slName: sics.vision.ExampleStorlet
+[16:33:18,016] INFO  {SREComponent} storlet exists
+[16:33:18,016] INFO  {SREComponent} storlet loaded
+[16:33:18,017] INFO  {SREComponent} Sync Trigger Event forwarded
+[16:33:20,119] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[16:33:20,120] INFO  {SREComponent} received an Deletion Request for slID: sics.vision.ExampleStorlet
+[16:33:21,846] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[16:33:21,847] INFO  {SREComponent} received an Deletion Request for slID: sics.vision.ExampleStorlet
+[16:33:23,497] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[16:33:23,503] INFO  {SREComponent} received an Sync Trigger for slName: sics.vision.ExampleStorlet
+[16:33:23,503] INFO  {SREComponent} storlet not exists
+[16:33:23,504] INFO  {SREComponent} storlet wrapper created, storlet instantiating
+[16:33:23,505] INFO  {SREComponent} Sync Trigger Event forwarded
+[16:33:25,034] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[16:33:25,034] INFO  {SREComponent} received an Deletion Request for slID: sics.vision.ExampleStorlet
+[16:33:26,764] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[16:33:26,764] INFO  {SREComponent} received an Deletion Request for slID: sics.vision.ExampleStorlet
+[16:33:27,126] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[16:33:27,126] INFO  {SREComponent} received an Deletion Request for slID: sics.vision.ExampleStorlet
+[16:33:29,830] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[16:33:29,831] INFO  {SREComponent} received an Deletion Request for slID: sics.vision.ExampleStorlet
+[16:33:31,555] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[16:33:31,560] INFO  {SREComponent} received an Sync Trigger for slName: sics.vision.ExampleStorlet
+[16:33:31,560] INFO  {SREComponent} storlet not exists
+[16:33:31,560] INFO  {SREComponent} storlet wrapper created, storlet instantiating
+[16:33:31,560] INFO  {SREComponent} Sync Trigger Event forwarded
+[16:33:34,008] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[16:33:34,008] INFO  {SREComponent} received an Deletion Request for slID: sics.vision.ExampleStorlet
+[16:58:14,113] INFO  {SREJettyWebServer} Handling init
+[16:58:22,558] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[16:58:22,590] INFO  {SREComponent} received an Sync Trigger for slName: sics.vision.ExampleStorlet
+[16:58:22,590] INFO  {SREComponent} storlet not exists
+[16:58:22,592] INFO  {SREComponent} storlet wrapper created, storlet instantiating
+[16:58:22,592] INFO  {SREComponent} Sync Trigger Event forwarded
+[16:58:42,292] INFO  {SREJettyWebServer} Handling init
+[16:58:44,116] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[16:58:44,150] INFO  {SREComponent} received an Sync Trigger for slName: sics.vision.ExampleStorlet
+[16:58:44,150] INFO  {SREComponent} storlet not exists
+[16:58:44,152] INFO  {SREComponent} storlet wrapper created, storlet instantiating
+[16:58:44,153] INFO  {SREComponent} Sync Trigger Event forwarded
+[16:59:26,141] INFO  {SREJettyWebServer} Handling init
+[16:59:31,414] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[16:59:31,415] INFO  {SREComponent} received an Deletion Request for slID: sics.vision.ExampleStorlet
+[17:00:01,567] INFO  {SREJettyWebServer} Handling init
+[17:00:06,064] INFO  {SREJettyWebServer} Handling Deletion of slID sics.vision.ExampleStorlet
+[17:00:06,065] INFO  {SREComponent} received an Deletion Request for slID: sics.vision.ExampleStorlet
+[17:00:46,165] INFO  {SREJettyWebServer} Handling init
+[17:01:32,642] INFO  {SREJettyWebServer} Handling init
+[17:01:42,149] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[17:01:42,183] INFO  {SREComponent} received an Sync Trigger for slName: sics.vision.ExampleStorlet
+[17:01:42,183] INFO  {SREComponent} storlet not exists
+[17:01:42,185] INFO  {SREComponent} storlet wrapper created, storlet instantiating
+[17:01:42,185] INFO  {SREComponent} Sync Trigger Event forwarded
+[17:02:07,040] INFO  {SREJettyWebServer} Handling init
+[17:02:11,549] INFO  {SREJettyWebServer} Handling an Sync Trigger
+[17:02:11,581] INFO  {SREComponent} received an Sync Trigger for slName: sics.vision.ExampleStorlet
+[17:02:11,581] INFO  {SREComponent} storlet not exists
+[17:02:11,583] INFO  {SREComponent} storlet wrapper created, storlet instantiating
+[17:02:11,583] INFO  {SREComponent} Sync Trigger Event forwarded

@@ -1,23 +1,3 @@
-/**
- * This file is part of the Kompics P2P Framework.
- * 
- * Copyright (C) 2009 Swedish Institute of Computer Science (SICS)
- * Copyright (C) 2009 Royal Institute of Technology (KTH)
- *
- * Kompics is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package web;
 
 import java.io.IOException;
@@ -31,8 +11,8 @@ import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.thread.QueuedThreadPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger; 
+import org.apache.log4j.PropertyConfigurator;
 
 import porttypes.SlRequest;
 
@@ -48,38 +28,25 @@ import se.sics.kompics.web.Web;
 import se.sics.kompics.web.jetty.JettyWebServerConfiguration;
 import se.sics.kompics.web.jetty.JettyWebServerInit;
 
-
-/**
- * The <code>JettyWebServer</code> class.
- * 
- * @author Cosmin Arad <cosmin@sics.se>
- * @version $Id: JettyWebServer.java 1134 2009-09-01 15:27:39Z Cosmin $
- */
 public final class SREJettyWebServer extends ComponentDefinition {
 
 	Positive<Web> web = positive(Web.class);
 	Positive<SlRequest> sreWeb = positive(SlRequest.class);
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SREJettyWebServer.class);
+	private static final Logger logger = Logger.getLogger(SREJettyWebServer.class);
 
 	private final SREJettyWebServer thisWS = this;
 
-	private String homePage;
-
 	public SREJettyWebServer() {
+		PropertyConfigurator.configure("log4j.properties");
 		subscribe(handleInit, control);
 	}
 
 	private Handler<JettyWebServerInit> handleInit = new Handler<JettyWebServerInit>() {
 		public void handle(JettyWebServerInit init) {
-			logger.debug("Handling init in thread {}", Thread.currentThread());
+			logger.info("Handling init");
 			JettyWebServerConfiguration config = init.getConfiguration();
 
-			homePage = config.getHomePage();
-			if (homePage == null) {
-				homePage = "<h1>Welcome!</h1>";
-			}
 			Server server = new Server(config.getPort());
 
 			QueuedThreadPool qtp = new QueuedThreadPool();
@@ -110,14 +77,13 @@ public final class SREJettyWebServer extends ComponentDefinition {
 	
 	void handleRequest(String target, org.mortbay.jetty.Request request,
 			HttpServletResponse response) throws IOException {
-		logger.debug("Handling request {} in thread {}", target,
-				Thread.currentThread());
+		
 		String[] args = target.split("/");
-		String slID = null;
+		String slID = "";
 		String handler = "";
 		String activationId = "";
 		if (args.length >= 3) {
-			System.out.println("target: " + args[2]);
+			//System.out.println("target: " + args[2]);
 			slID = args[2];
 		}
 		if (args.length == 5) {
@@ -128,28 +94,31 @@ public final class SREJettyWebServer extends ComponentDefinition {
 		if (slID == null) {
 			return;
 		}
-
-		logger.debug("Triggering request {}", target);
-
+		
 		String line;
 		String body = "";
 		String method = request.getMethod();
 		while ((line = request.getReader().readLine()) != null) {
 			body = body.concat(line);
 		}
-		
+		//logger.info("Handling request: " + method.equals("POST") + slID.equals("syncStorlet"));
 		ObjectMapper om = new ObjectMapper();
 		
 		if (method.equals("POST") && !handler.equals("")){
+			logger.info("Handling an Async Trigger with activation id " + 
+		activationId + ", slID "+ slID + ", handler " + handler);
 			EventModel em = om.readValue(body, EventModel.class);
-			trigger(new AsyncTrigger(slID, handler, em), sreWeb);
+			trigger(new AsyncTrigger(slID, handler, em, activationId), sreWeb);
 		}
 		else if (method.equals("POST") && slID.equals("syncStorlet")){
+			logger.info("Handling an Sync Trigger");
 			SyncSLActivation syncAct = om.readValue(body, SyncSLActivation.class);
 			trigger(new SyncTrigger(syncAct), sreWeb);
 		}
-		else if (method.equals("DELETE"))
+		else if (method.equals("DELETE")){
+			logger.info("Handling Deletion of slID " + slID);
 			trigger(new SlDelete(slID), sreWeb);
+		}
 
 	}
 }

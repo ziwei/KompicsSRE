@@ -1,0 +1,74 @@
+[16:33:16,356] INFO  {StorletWrapper} loading storlet with slID: sics.vision.ExampleStorlet
+[16:33:16,362] INFO  {StorletWrapper} -----[TEMP]Created work directory for sics.vision.ExampleStorlet at /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[]
+[16:33:16,389] INFO  {StorletWrapper} storlet class loaded: storlets4testing.ExampleStorlet
+[16:33:16,777] INFO  {StorletWrapper} storlet with slID: sics.vision.ExampleStorlet loaded
+[16:33:16,777] INFO  {StorletWrapper} Activation: 1. Async triggering storlet with slID: sics.vision.ExampleStorlet by handler: handlerE
+[16:33:16,778] INFO  {StorletWrapper} Activation: 1. Async triggering storlet with slID: sics.vision.ExampleStorlet by handler: handlerE completed
+[16:33:18,017] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet port: 8080 params: sics.vision.ExampleStorlet
+[16:33:18,030] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet completed
+[16:33:23,505] INFO  {StorletWrapper} loading storlet with slID: sics.vision.ExampleStorlet
+[16:33:23,506] INFO  {StorletWrapper} -----[TEMP]Created work directory for sics.vision.ExampleStorlet at /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[]
+[16:33:23,530] INFO  {StorletWrapper} storlet class loaded: storlets4testing.ExampleStorlet
+[16:33:23,631] INFO  {StorletWrapper} storlet with slID: sics.vision.ExampleStorlet loaded
+[16:33:23,631] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet port: 8080 params: sics.vision.ExampleStorlet
+[16:33:23,632] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet completed
+[16:33:31,560] INFO  {StorletWrapper} loading storlet with slID: sics.vision.ExampleStorlet
+[16:33:31,561] INFO  {StorletWrapper} -----[TEMP]Created work directory for sics.vision.ExampleStorlet at /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[]
+[16:33:31,579] INFO  {StorletWrapper} storlet class loaded: storlets4testing.ExampleStorlet
+[16:33:31,679] INFO  {StorletWrapper} storlet with slID: sics.vision.ExampleStorlet loaded
+[16:33:31,679] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet port: 8080 params: sics.vision.ExampleStorlet
+[16:33:31,680] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet completed
+[16:58:22,592] INFO  {StorletWrapper} loading storlet with slID: sics.vision.ExampleStorlet
+[16:58:22,602] INFO  {StorletWrapper} -----[TEMP]Created work directory for sics.vision.ExampleStorlet at /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[]
+[16:58:22,625] INFO  {StorletWrapper} -----[TEMP]Extracted storlet INSTANCE content for sics.vision.ExampleStorlet into /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[/home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/src.jar, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/params.properties, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/authentication, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/dependency.jar]
+		Size = 0
+[16:58:22,629] INFO  {StorletWrapper} storlet class loaded: storlets4testing.ExampleStorlet
+[16:58:22,946] INFO  {StorletWrapper} storlet with slID: sics.vision.ExampleStorlet loaded
+[16:58:22,946] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet port: 8080 params: sics.vision.ExampleStorlet
+[16:58:22,951] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet completed
+[16:58:44,153] INFO  {StorletWrapper} loading storlet with slID: sics.vision.ExampleStorlet
+[16:58:44,162] INFO  {StorletWrapper} -----[TEMP]Created work directory for sics.vision.ExampleStorlet at /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[]
+[16:58:44,190] INFO  {StorletWrapper} -----[TEMP]Extracted storlet INSTANCE content for sics.vision.ExampleStorlet into /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[/home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/src.jar, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/params.properties, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/authentication, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/dependency.jar]
+		Size = 0
+[16:58:44,193] INFO  {StorletWrapper} storlet class loaded: storlets4testing.ExampleStorlet
+[16:58:44,514] INFO  {StorletWrapper} storlet with slID: sics.vision.ExampleStorlet loaded
+[16:58:44,515] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet port: 8080 params: sics.vision.ExampleStorlet
+[16:58:44,519] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet completed
+[17:01:42,185] INFO  {StorletWrapper} loading storlet with slID: sics.vision.ExampleStorlet
+[17:01:42,195] INFO  {StorletWrapper} -----[TEMP]Created work directory for sics.vision.ExampleStorlet at /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[]
+[17:01:42,216] INFO  {StorletWrapper} -----[TEMP]Extracted storlet INSTANCE content for sics.vision.ExampleStorlet into /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[/home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/src.jar, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/params.properties, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/authentication, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/dependency.jar]
+		Size = 0
+[17:01:42,219] INFO  {StorletWrapper} storlet class loaded: storlets4testing.ExampleStorlet
+[17:01:42,536] INFO  {StorletWrapper} storlet with slID: sics.vision.ExampleStorlet loaded
+[17:01:42,537] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet port: 8080 params: sics.vision.ExampleStorlet
+[17:01:42,541] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet completed
+[17:02:11,583] INFO  {StorletWrapper} loading storlet with slID: sics.vision.ExampleStorlet
+[17:02:11,597] INFO  {StorletWrapper} -----[TEMP]Created work directory for sics.vision.ExampleStorlet at /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[]
+[17:02:11,621] INFO  {StorletWrapper} -----[TEMP]Extracted storlet INSTANCE content for sics.vision.ExampleStorlet into /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet
+		[exists=true:dir=true]
+		[/home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/src.jar, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/params.properties, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/authentication, /home/ziwei/workspace/KompicsSRE/tmp/SREtmp/sl/sics.vision.ExampleStorlet/dependency.jar]
+		Size = 0
+[17:02:11,625] INFO  {StorletWrapper} storlet class loaded: storlets4testing.ExampleStorlet
+[17:02:11,939] INFO  {StorletWrapper} storlet with slID: sics.vision.ExampleStorlet loaded
+[17:02:11,939] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet port: 8080 params: sics.vision.ExampleStorlet
+[17:02:11,944] INFO  {StorletWrapper} Sync triggering storlet with slName: sics.vision.ExampleStorlet completed

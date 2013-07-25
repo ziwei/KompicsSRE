@@ -1,6 +1,7 @@
 package util;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +15,7 @@ import java.util.Properties;
 import java.util.jar.JarFile;
 
 import eu.visioncloud.storlet.common.SPEConstants;
+import eu.visioncloud.storlet.common.Utils;
 
 public class FakeObjectService {
 	final String workDir = "/home/ziwei/workspace/KompicsSRE/test/";
@@ -31,45 +33,49 @@ public class FakeObjectService {
 		
 	}
 	
-	public InputStream getObjectContentsAsStream(String tenant, String container, String object) throws FileNotFoundException{
+	public InputStream getObjectContentsAsStream(String tenant, String container, String object) throws IOException{
 		File file = new File("/home/ziwei/workspace/KompicsSRE/test/test.jar");
 		FileInputStream fInput = new FileInputStream(file);
 		BufferedInputStream bInput = new BufferedInputStream(fInput);
-		DataInputStream dInput = new DataInputStream(bInput);
-		return dInput;
+		byte[] rawByteArray = Utils.inputStreamToByteArray(bInput);
+		byte[] encodedByteArray = Utils.encodeByteArray(rawByteArray);
+		
+		InputStream input = new ByteArrayInputStream(encodedByteArray);
+		//DataInputStream dInput = new DataInputStream(bInput);
+		return input;
 	}
 	
-	public void unzipJar(String dir) throws IOException {
-		JarFile jar = new JarFile("/home/ziwei/workspace/KompicsSRE/test/test.jar");
-		Enumeration enumEntries = jar.entries();
-		//java.io.File subDir = new File(dir + java.io.File.separator + jarName);
-		//subDir.mkdir();
-		while (enumEntries.hasMoreElements()) {
-			java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries
-					.nextElement();
-			java.io.File f = new java.io.File(dir + java.io.File.separator
-					+ file.getName());
-			System.out.println(dir);
-			if (file.isDirectory()) { // if its a directory, create it
-				f.mkdir();
-				continue;
-			}
-			java.io.InputStream is;
-			try {
-				is = jar.getInputStream(file);
-				java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-				while (is.available() > 0) { // write contents of 'is' to
-												// 'fos'
-					fos.write(is.read());
-				}
-				fos.close();
-				is.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} // get the input stream
-
-		}
-	}
+//	public void unzipJar(String dir) throws IOException {
+//		JarFile jar = new JarFile("/home/ziwei/workspace/KompicsSRE/test/test.jar");
+//		Enumeration enumEntries = jar.entries();
+//		//java.io.File subDir = new File(dir + java.io.File.separator + jarName);
+//		//subDir.mkdir();
+//		while (enumEntries.hasMoreElements()) {
+//			java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries
+//					.nextElement();
+//			java.io.File f = new java.io.File(dir + java.io.File.separator
+//					+ file.getName());
+//			//System.out.println(dir);
+//			if (file.isDirectory()) { // if its a directory, create it
+//				f.mkdir();
+//				continue;
+//			}
+//			java.io.InputStream is;
+//			try {
+//				is = jar.getInputStream(file);
+//				java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+//				while (is.available() > 0) { // write contents of 'is' to
+//												// 'fos'
+//					fos.write(is.read());
+//				}
+//				fos.close();
+//				is.close();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} // get the input stream
+//
+//		}
+//	}
 
 }
