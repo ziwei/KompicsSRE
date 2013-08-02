@@ -19,25 +19,34 @@ import se.sics.kompics.Handler;
 import se.sics.kompics.Negative;
 
 import util.FakeObjectService;
-import web.SREJettyWebServer;
 
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import constant.SREConst;
+
+import com.jezhumble.javasysmon.CpuTimes;
+import com.jezhumble.javasysmon.JavaSysMon;
+import com.jezhumble.javasysmon.MemoryStats;
 
 public class StorletWrapper extends ComponentDefinition {
 	Negative<SlRequest> slReq = negative(SlRequest.class);
-	int messages;
+	//private static boolean started = false;
+	private static int loadedSl = 0;
 	private Storlet storlet;
+	public static Map<String, Object> logTable = new HashMap<String, Object>();
 	
 	private static FakeObjectService oClient = new FakeObjectService();
 	private static final Logger logger = Logger.getLogger(StorletWrapper.class);
+	private static final Logger benchLogger = Logger.getLogger("benchmark");
+	private static final JavaSysMon sysMon = new JavaSysMon();
+	private static long startMem = sysMon.physical().getFreeBytes();
 	
 	public StorletWrapper() {
+		//PropertyConfigurator.configure("log4j.properties");
 		subscribe(handleInit, control);
 		subscribe(slAsyncTriggerH, slReq);
 		subscribe(slSyncTriggerH, slReq);
@@ -45,22 +54,33 @@ public class StorletWrapper extends ComponentDefinition {
 
 	private Handler<StorletInit> handleInit = new Handler<StorletInit>() {
 		public void handle(StorletInit init) {
+//			if (started == false){
+//				startMem = sysMon.physical().getFreeBytes();
+//				started = true;
+//			}
 			logger.info("loading storlet with slID: "+init.getSlID());
 			storlet = loadStorlet(init.getSlID());
 			logger.info("storlet with slID: "+init.getSlID()+" loaded");
+			
+			//logAndIncreament();
 		}
 	};
 
 	Handler<AsyncTrigger> slAsyncTriggerH = new Handler<AsyncTrigger>() {
 
 		public void handle(AsyncTrigger trigger) {
-			messages++;
+			
+			//messages++;
 			// need evaluate the event before execution?
 			try {
 				logger.info("Activation: "+trigger.getActId()+". Async triggering storlet with slID: "+trigger.getSlID() +" by handler: " + trigger.getHandlerId());
+				long startTime = System.currentTimeMillis();
 				storlet.getTriggerHandler(trigger.getHandlerId()).execute(
 						trigger.getEventModel());
-				logger.info("Activation: "+trigger.getActId()+". Async triggering storlet with slID: "+trigger.getSlID() +" by handler: " + trigger.getHandlerId()+" completed");
+				
+				long endTime = System.currentTimeMillis();
+				logger.info("Activation: "+trigger.getActId()+". Async triggering storlet with slID: "+
+				trigger.getSlID() +" by handler: " + trigger.getHandlerId()+" completed, "+"duration: "+ (endTime-startTime) + " Misec");
 			} catch (StorletException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -71,7 +91,7 @@ public class StorletWrapper extends ComponentDefinition {
 
 	Handler<SyncTrigger> slSyncTriggerH = new Handler<SyncTrigger>() {
 		public void handle(SyncTrigger trigger) {
-			messages++;
+			//messages++;
 			try {
 				logger.info("Sync triggering storlet with slName: "+trigger.getSyncAct().getStorlet_name() +
 						" port: "+trigger.getSyncAct().getPort() + " params: "+trigger.getSyncAct().getParameter());
@@ -90,15 +110,18 @@ public class StorletWrapper extends ComponentDefinition {
 	};
 	
 	private Storlet loadStorlet(String slID) {
-		// convert the slID into something easier to handle
+		
+		//long startTime = System.currentTimeMillis();
+		//MemoryStats startMs = sysMon.physical();
 		
 		Storlet storlet = null;
-		ObjIdentifier storletInstanceId = ObjIdentifier.createFromString(slID);
+		
 		File workFolder = new File(SREConst.slFolderPath + File.separator
 				+ slID);
 		Utils.deleteFileOrDirectory(workFolder);
 		workFolder.mkdirs();
-
+		ObjIdentifier storletInstanceId = ObjIdentifier.createFromString(slID);
+		//ObjIdentifier storletInstanceId = ObjIdentifier.createFromString(slID.substring(0, 26));// for benchmarking, 3 is the number of suffix digits
 		// TODO temp, remove
 		logger.info("-----[TEMP]Created work directory for "
 				+ storletInstanceId.toString() + " at "
@@ -122,8 +145,10 @@ public class StorletWrapper extends ComponentDefinition {
 			
 			// check if code is stored in a different object
 			// if yes download it and store in work folder
+			logger.info(storletDefinitionId.toString()+" "+storletInstanceId.toString());
 			if (!storletDefinitionId.equals(storletInstanceId)) {
 				// Encoded String Stream
+				
 				InputStream slDefinitionContentEncodedStream = oClient
 						.getObjectContentsAsStream(
 								storletDefinitionId.getTenantName(),
@@ -156,18 +181,22 @@ public class StorletWrapper extends ComponentDefinition {
 			Utils.extractJarContents(
 					Utils.decodeStream(slInstanceContentEncodedStream),
 					workFolder.getAbsolutePath());
-
+			//long endTime = System.currentTimeMillis();
+			//CpuTimes endCpuTimes = sysMon.cpuTimes();
+			//MemoryStats endMs = sysMon.physical();
 			// TODO temp, remove
-			byte[] slInstanceContentBytes = Utils.inputStreamToByteArray(Utils
-					.decodeStream(slInstanceContentEncodedStream));
-			logger.info("-----[TEMP]Extracted storlet INSTANCE content for "
-					+ storletInstanceId + " into "
-					+ workFolder.getAbsolutePath() + "\n\t\t[exists="
-					+ workFolder.exists() + ":dir=" + workFolder.isDirectory()
-					+ "]\n\t\t" + Arrays.toString(workFolder.listFiles())
-					+ "\n\t\tSize = " + slInstanceContentBytes.length);
-			//oClient.unzipJar(workFolder.getAbsolutePath());
+//			byte[] slInstanceContentBytes = Utils.inputStreamToByteArray(Utils
+//					.decodeStream(slInstanceContentEncodedStream));
+//			logger.info("-----[TEMP]Extracted storlet INSTANCE content for "
+//					+ storletInstanceId + " into "
+//					+ workFolder.getAbsolutePath() + "\n\t\t[exists="
+//					+ workFolder.exists() + ":dir=" + workFolder.isDirectory()
+//					+ "]\n\t\t" + Arrays.toString(workFolder.listFiles())
+//					+ "\n\t\tSize = " + slInstanceContentBytes.length);
+			//oClient.unzipJar(workFolder.getAbsolutePath());//my unpack method, slower
 			// Load storlet class from jar & activate it
+			long startTime = System.currentTimeMillis();
+			//CpuTimes startCpuTimes = sysMon.cpuTimes();
 			File jarFile = new File(workFolder,
 					SPEConstants.STORLET_CODE_FILENAME);
 			Class<? extends Storlet> storletClass = (Class<? extends Storlet>) Utils
@@ -175,12 +204,27 @@ public class StorletWrapper extends ComponentDefinition {
 			logger.info("storlet class loaded: " + storletClass.getName());
 			storlet = Storlet.createStorlet(storletClass, workFolder,
 					SREConst.ccsURL);
-			//trigger(new StorletInit(storlet, socket), newStorletWrapper.getControl());
+			long endTime = System.currentTimeMillis();
+			//CpuTimes endCpuTimes = sysMon.cpuTimes();
+			logger.info("load the storlet cost " + (endTime-startTime));
+			//benchLogger.info((endTime-startTime) + " on " + slID.substring(26, slID.length()));
+			//benchLogger.info((endMs.getFreeBytes()-startMs.getFreeBytes()));
+			
 		} catch (Exception e) {
 			//log.error(String.format("Error in loadStorlet(%s)", slID), e);
 		}
 //		if (!SREConst.noCache)
 //			storletQueue.put(slID, storlet);
+		
 		return storlet;
+	}
+	
+	private synchronized void logAndIncreament(){
+		loadedSl++;
+		//if (loadedSl%10 == 1){
+			long memCost = (startMem - sysMon.physical().getFreeBytes());
+			benchLogger.info(memCost);
+		//}
+		
 	}
 }

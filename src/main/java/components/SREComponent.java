@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.LoggerFactory;
 
+import com.jezhumble.javasysmon.JavaSysMon;
+
 import porttypes.SlRequest;
 import eu.visioncloud.storlet.common.Utils;
 import events.SlDelete;
@@ -28,7 +30,9 @@ public class SREComponent extends ComponentDefinition {
 	Negative<SlRequest> slReq = negative(SlRequest.class);
 	private Map<String, Component> storletQueue;
 	private static final Logger logger = Logger.getLogger(SREComponent.class);
-	
+	int counter = 0;
+	private static final Logger benchLogger = Logger.getLogger("benchmark");
+	private static final JavaSysMon sysMon = new JavaSysMon();
 	public SREComponent() {
 		PropertyConfigurator.configure("log4j.properties");
 		storletQueue = new HashMap<String, Component>();
@@ -45,6 +49,9 @@ public class SREComponent extends ComponentDefinition {
 				logger.info("storlet not exists");
 				storletWrapper = create(StorletWrapper.class);
 				storletQueue.put(slEvent.getSlID(), storletWrapper);
+				//Increament();
+				//trigger(new StorletInit(slEvent.getSlID()+counter), storletWrapper.getControl());
+				
 				trigger(new StorletInit(slEvent.getSlID()), storletWrapper.getControl());
 				logger.info("storlet wrapper created, storlet instantiating");
 			}
@@ -87,5 +94,7 @@ public class SREComponent extends ComponentDefinition {
 			Utils.deleteFileOrDirectory(workFolder);
 		}
 	};
-
+	private synchronized void Increament(){
+		counter++;
+	}
 }

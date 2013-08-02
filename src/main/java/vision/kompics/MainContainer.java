@@ -17,7 +17,7 @@ import web.SREJettyWebServer;
 public class MainContainer extends ComponentDefinition {
 	public static void main(String[] args) {
 		// selfId = Integer.parseInt(args[0]);
-		Kompics.createAndStart(MainContainer.class, 8);
+		Kompics.createAndStart(MainContainer.class, 16);
 	}
 
 	public MainContainer() throws IOException {
