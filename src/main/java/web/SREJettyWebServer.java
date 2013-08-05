@@ -1,22 +1,34 @@
 package web;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
 import msgTypes.SyncSLActivation;
 
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.thread.QueuedThreadPool;
-import org.apache.log4j.Logger; 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.lf5.util.StreamUtils;
+
+import components.StorletWrapper;
 
 import porttypes.SlRequest;
 
 import eu.visioncloud.storlet.common.EventModel;
+import eu.visioncloud.storlet.common.Utils;
 import events.SlDelete;
 import events.SyncTrigger;
 import events.AsyncTrigger;
@@ -33,7 +45,8 @@ public final class SREJettyWebServer extends ComponentDefinition {
 	Positive<Web> web = positive(Web.class);
 	Positive<SlRequest> sreWeb = positive(SlRequest.class);
 
-	private static final Logger logger = Logger.getLogger(SREJettyWebServer.class);
+	private static final Logger logger = Logger
+			.getLogger(SREJettyWebServer.class);
 
 	private final SREJettyWebServer thisWS = this;
 
@@ -70,55 +83,90 @@ public final class SREJettyWebServer extends ComponentDefinition {
 			}
 		}
 	};
-	
-	
-	
-	
-	
+
 	void handleRequest(String target, org.mortbay.jetty.Request request,
 			HttpServletResponse response) throws IOException {
-		
-		String[] args = target.split("/");
-		String slID = "";
-		String handler = "";
-		String activationId = "";
-		if (args.length >= 3) {
-			//System.out.println("target: " + args[2]);
-			slID = args[2];
-		}
-		if (args.length == 5) {
-			handler = args[3];
-			activationId = args[4];
-		}
-
-		if (slID == null) {
-			return;
-		}
-		
-		String line;
-		String body = "";
 		String method = request.getMethod();
-		while ((line = request.getReader().readLine()) != null) {
-			body = body.concat(line);
+		String[] args = target.split("/");
+		if (method.equals("POST") || method.equals("DELETE")) {
+			String slID = "";
+			String handler = "";
+			String activationId = "";
+			if (args.length >= 3) {
+				slID = args[2];
+			}
+			if (args.length == 5) {
+				handler = args[3];
+				activationId = args[4];
+			}
+
+			if (slID == null) {
+				return;
+			}
+			String header = request.getHeader("Accept");
+			//System.out.println(header);
+			String line;
+			String body = "";
+			while ((line = request.getReader().readLine()) != null) {
+				body = body.concat(line);
+			}
+			generateEvent(method, handler, slID, activationId, header, body);
 		}
-		//logger.info("Handling request: " + method.equals("POST") + slID.equals("syncStorlet"));
+		else if (method.equals("GET")){
+			if (args.length == 3){
+				String targetLog = args[2];
+				if (targetLog.equals("sre")){
+					response.reset();
+					copyFileToOutstream(targetLog, response.getOutputStream());
+					response.flushBuffer();
+				}
+				else if (targetLog.equals("storlets")){
+					response.reset();
+					copyFileToOutstream(targetLog, response.getOutputStream());
+					response.flushBuffer();
+				}
+			}
+			else if (args.length == 5){
+				if (args[2].equals("logFor")){
+					if (args[3].equals("slID")){
+						System.out.println(StorletWrapper.slLogTable.get(args[4]));
+					}
+					else if (args[3].equals("activationID")){
+						System.out.println(args[4]);
+					}
+				}
+			}
+		}
+	}
+	private void copyFileToOutstream(String logName, OutputStream out) throws IOException{
+	    BufferedInputStream is = new BufferedInputStream(new FileInputStream("/home/ziwei/workspace/KompicsSRE/"+logName+".log"));
+	    byte[] buf = new byte[4 * 1024]; // 4K buffer
+	    int bytesRead;
+	    while ((bytesRead = is.read(buf)) != -1) {
+	        out.write(buf, 0, bytesRead);
+	    }
+	    is.close();
+	    out.flush();
+	    out.close();
+	}
+	private void generateEvent(String method, String handler, String slID,
+			String activationId, String header, String body) throws JsonParseException,
+			JsonMappingException, IOException {
 		ObjectMapper om = new ObjectMapper();
-		
-		if (method.equals("POST") && !handler.equals("")){
-			logger.info("Handling an Async Trigger with activation id " + 
-		activationId + ", slID "+ slID + ", handler " + handler);
+
+		if (method.equals("POST") && !handler.equals("") && header.equals("application/json")) {
+			logger.info("Handling an Async Trigger with activation id "
+					+ activationId + ", slID " + slID + ", handler " + handler);
 			EventModel em = om.readValue(body, EventModel.class);
 			trigger(new AsyncTrigger(slID, handler, em, activationId), sreWeb);
-		}
-		else if (method.equals("POST") && slID.equals("syncStorlet")){
+		} else if (method.equals("POST") && slID.equals("syncStorlet") && header.equals("application/json")) {
 			logger.info("Handling an Sync Trigger");
-			SyncSLActivation syncAct = om.readValue(body, SyncSLActivation.class);
+			SyncSLActivation syncAct = om.readValue(body,
+					SyncSLActivation.class);
 			trigger(new SyncTrigger(syncAct), sreWeb);
-		}
-		else if (method.equals("DELETE")){
+		} else if (method.equals("DELETE")) {
 			logger.info("Handling Deletion of slID " + slID);
 			trigger(new SlDelete(slID), sreWeb);
 		}
-
 	}
 }

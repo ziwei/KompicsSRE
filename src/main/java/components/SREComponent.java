@@ -88,6 +88,7 @@ public class SREComponent extends ComponentDefinition {
 	Handler<SlDelete> slDeleteH = new Handler<SlDelete>() {
 		public void handle(SlDelete slEvent) {
 			logger.info("received an Deletion Request for slID: " + slEvent.getSlID());
+			destroy(storletQueue.get(slEvent.getSlID()));
 			storletQueue.remove(slEvent.getSlID());
 			File workFolder = new File(SREConst.slFolderPath + File.separator
 					+ slEvent.getSlID());

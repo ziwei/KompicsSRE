@@ -23,7 +23,9 @@ import util.FakeObjectService;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import constant.SREConst;
@@ -35,9 +37,11 @@ import com.jezhumble.javasysmon.MemoryStats;
 public class StorletWrapper extends ComponentDefinition {
 	Negative<SlRequest> slReq = negative(SlRequest.class);
 	//private static boolean started = false;
-	private static int loadedSl = 0;
+	private static int loadedSl = 0;//for benchmarking
 	private Storlet storlet;
-	public static Map<String, Object> logTable = new HashMap<String, Object>();
+	
+	public static Map<String, Set> slLogTable = new HashMap<String, Set>();
+	public static Map<String, AsyncTrigger> actLogTable = new HashMap<String, AsyncTrigger>();
 	
 	private static FakeObjectService oClient = new FakeObjectService();
 	private static final Logger logger = Logger.getLogger(StorletWrapper.class);
@@ -78,6 +82,17 @@ public class StorletWrapper extends ComponentDefinition {
 				storlet.getTriggerHandler(trigger.getHandlerId()).execute(
 						trigger.getEventModel());
 				
+				if (slLogTable.containsKey(trigger.getSlID())){
+					Set set = slLogTable.get(trigger.getSlID());
+					set.add(trigger.getActId());
+				}
+				else{
+					Set set = new HashSet();
+					set.add(trigger.getActId());
+					slLogTable.put(trigger.getSlID(), set);
+				}
+				actLogTable.put(trigger.getActId(), trigger);
+					
 				long endTime = System.currentTimeMillis();
 				logger.info("Activation: "+trigger.getActId()+". Async triggering storlet with slID: "+
 				trigger.getSlID() +" by handler: " + trigger.getHandlerId()+" completed, "+"duration: "+ (endTime-startTime) + " Misec");
