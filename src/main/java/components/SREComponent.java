@@ -48,11 +48,11 @@ public class SREComponent extends ComponentDefinition {
 			if (!storletQueue.containsKey(slEvent.getSlID())) {
 				logger.info("storlet not exists");
 				storletWrapper = create(StorletWrapper.class);
-				storletQueue.put(slEvent.getSlID(), storletWrapper);
-				//Increament();
-				//trigger(new StorletInit(slEvent.getSlID()+counter), storletWrapper.getControl());
+				//storletQueue.put(slEvent.getSlID(), storletWrapper);
+				Increament();
+				trigger(new StorletInit(slEvent.getSlID()+counter), storletWrapper.getControl());
 				
-				trigger(new StorletInit(slEvent.getSlID()), storletWrapper.getControl());
+				//trigger(new StorletInit(slEvent.getSlID()), storletWrapper.getControl());
 				logger.info("storlet wrapper created, storlet instantiating");
 			}
 			else{
@@ -60,7 +60,7 @@ public class SREComponent extends ComponentDefinition {
 				storletWrapper = storletQueue.get(slEvent.getSlID());
 				logger.info("storlet loaded");
 			}
-			trigger(slEvent, storletWrapper.getPositive(SlRequest.class));
+			//trigger(slEvent, storletWrapper.getPositive(SlRequest.class));
 			logger.info("Async Trigger Event forwarded");
 		}
 	};

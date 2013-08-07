@@ -66,7 +66,7 @@ public class StorletWrapper extends ComponentDefinition {
 			storlet = loadStorlet(init.getSlID());
 			logger.info("storlet with slID: "+init.getSlID()+" loaded");
 			
-			//logAndIncreament();
+			logAndIncreament();
 		}
 	};
 
@@ -135,8 +135,8 @@ public class StorletWrapper extends ComponentDefinition {
 				+ slID);
 		Utils.deleteFileOrDirectory(workFolder);
 		workFolder.mkdirs();
-		ObjIdentifier storletInstanceId = ObjIdentifier.createFromString(slID);
-		//ObjIdentifier storletInstanceId = ObjIdentifier.createFromString(slID.substring(0, 26));// for benchmarking, 3 is the number of suffix digits
+		//ObjIdentifier storletInstanceId = ObjIdentifier.createFromString(slID);
+		ObjIdentifier storletInstanceId = ObjIdentifier.createFromString(slID.substring(0, 26));// for benchmarking, 3 is the number of suffix digits
 		// TODO temp, remove
 		logger.info("-----[TEMP]Created work directory for "
 				+ storletInstanceId.toString() + " at "
@@ -236,10 +236,10 @@ public class StorletWrapper extends ComponentDefinition {
 	
 	private synchronized void logAndIncreament(){
 		loadedSl++;
-		//if (loadedSl%10 == 1){
+		if (loadedSl%10 == 1){
 			long memCost = (startMem - sysMon.physical().getFreeBytes());
 			benchLogger.info(memCost);
-		//}
+		}
 		
 	}
 }

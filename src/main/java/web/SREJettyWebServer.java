@@ -47,7 +47,7 @@ public final class SREJettyWebServer extends ComponentDefinition {
 
 	private static final Logger logger = Logger
 			.getLogger(SREJettyWebServer.class);
-
+	private static final Logger benchLogger = Logger.getLogger("benchmark");
 	private final SREJettyWebServer thisWS = this;
 
 	public SREJettyWebServer() {
@@ -89,6 +89,7 @@ public final class SREJettyWebServer extends ComponentDefinition {
 		String method = request.getMethod();
 		String[] args = target.split("/");
 		if (method.equals("POST") || method.equals("DELETE")) {
+			long startTime = System.currentTimeMillis();
 			String slID = "";
 			String handler = "";
 			String activationId = "";
@@ -111,6 +112,8 @@ public final class SREJettyWebServer extends ComponentDefinition {
 				body = body.concat(line);
 			}
 			generateEvent(method, handler, slID, activationId, header, body);
+			long endTime = System.currentTimeMillis();
+			//benchLogger.info((endTime - startTime));
 		}
 		else if (method.equals("GET")){
 			if (args.length == 3){
