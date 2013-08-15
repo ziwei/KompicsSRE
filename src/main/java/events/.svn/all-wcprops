@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/vision/!svn/ver/518/SRE-Kompics/KompicsSRE/src/main/java/events
+END
+SlOperation.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/vision/!svn/ver/518/SRE-Kompics/KompicsSRE/src/main/java/events/SlOperation.java
+END
+StorletLoadingFault.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/vision/!svn/ver/518/SRE-Kompics/KompicsSRE/src/main/java/events/StorletLoadingFault.java
+END
+SyncTrigger.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/vision/!svn/ver/518/SRE-Kompics/KompicsSRE/src/main/java/events/SyncTrigger.java
+END
+AsyncTrigger.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/vision/!svn/ver/518/SRE-Kompics/KompicsSRE/src/main/java/events/AsyncTrigger.java
+END
+StorletInit.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/vision/!svn/ver/518/SRE-Kompics/KompicsSRE/src/main/java/events/StorletInit.java
+END
+SlDelete.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/vision/!svn/ver/518/SRE-Kompics/KompicsSRE/src/main/java/events/SlDelete.java
+END

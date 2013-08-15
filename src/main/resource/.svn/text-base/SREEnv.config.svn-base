@@ -1,0 +1,17 @@
+workers 16
+
+server.ip localhost
+server.port 8080
+request.timeout 1000
+threads.max 4
+home.page <h2>This is an SRE web server</h2>
+
+logProp /home/ziwei/workspace/KompicsSRE/deployment/log4j.properties
+logDir /home/ziwei/workspace/KompicsSRE/deployment/logs/
+slFolderPath /home/ziwei/workspace/KompicsSRE/deployment/tmp/SREtmp/
+
+storageServiceUrl http://10.0.1.101:8080/CCS/
+contentCentricUrl http://127.0.0.1:8080/CCS/
+tenant sics
+user xxx
+password xxx
