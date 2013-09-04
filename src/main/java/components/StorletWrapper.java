@@ -15,6 +15,7 @@ import eu.visioncloud.storlet.common.StorletException;
 import eu.visioncloud.storlet.common.SyncOutputStream;
 import eu.visioncloud.storlet.common.Utils;
 import events.AsyncTrigger;
+import events.MyTimeout;
 import events.StorletInit;
 import events.StorletLoadingFault;
 import events.SyncTrigger;
@@ -22,6 +23,12 @@ import porttypes.SlRequest;
 import se.sics.kompics.ComponentDefinition;
 import se.sics.kompics.Handler;
 import se.sics.kompics.Negative;
+import se.sics.kompics.Positive;
+import se.sics.kompics.Start;
+import se.sics.kompics.timer.CancelTimeout;
+import se.sics.kompics.timer.ScheduleTimeout;
+import se.sics.kompics.timer.Timeout;
+import se.sics.kompics.timer.Timer;
 import util.Configurator;
 
 
@@ -31,12 +38,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
 
 public class StorletWrapper extends ComponentDefinition {
 	Negative<SlRequest> slReq = negative(SlRequest.class);
+	Positive<Timer> timer = positive(Timer.class);
+	UUID timeoutId;
 	//private static boolean started = false;
 	//private static int loadedSl = 0;//for benchmarking
 	private Storlet storlet;
@@ -65,6 +75,8 @@ public class StorletWrapper extends ComponentDefinition {
 	public StorletWrapper() {
 		//PropertyConfigurator.configure("log4j.properties");
 		subscribe(handleInit, control);
+		subscribe(handleStart, control);
+		subscribe(handleStop, control);
 		subscribe(slAsyncTriggerH, slReq);
 		subscribe(slSyncTriggerH, slReq);
 	}
@@ -83,6 +95,40 @@ public class StorletWrapper extends ComponentDefinition {
 			
 			//logAndIncreament();
 		}
+	};
+	
+	private Handler<Start> handleStart = new Handler<Start>() {//cancel when stop?
+
+		@Override
+		public void handle(Start event) {
+			// TODO Auto-generated method stub
+			long delay = 5000;
+			ScheduleTimeout st = new ScheduleTimeout(delay);
+			st.setTimeoutEvent(new MyTimeout(st));
+			timeoutId = st.getTimeoutEvent().getTimeoutId();
+			trigger(st, timer);
+		}
+		
+	};
+	
+	private Handler<Start> handleStop = new Handler<Start>() {//cancel when stop?
+
+		@Override
+		public void handle(Start event) {
+			// TODO Auto-generated method stub
+			trigger(new CancelTimeout(timeoutId), timer);
+		}
+		
+	};
+	
+	Handler<MyTimeout> handleTimtout = new Handler<MyTimeout>() {
+
+		@Override
+		public void handle(MyTimeout event) {
+			// TODO Auto-generated method stub
+			System.out.println("the execution timeout");
+		}
+		
 	};
 
 	Handler<AsyncTrigger> slAsyncTriggerH = new Handler<AsyncTrigger>() {
@@ -164,7 +210,7 @@ public class StorletWrapper extends ComponentDefinition {
 				+ "]\n\t\t" + Arrays.toString(workFolder.listFiles()));
 
 		try {
-			Map<String, String> slMD = oClient.getObjectMetadataEntries(
+			Map<String, Object> slMD = oClient.getObjectMetadataEntries(
 					storletInstanceId.getTenantName(),
 					storletInstanceId.getContainerName(),
 					storletInstanceId.getObjectName());

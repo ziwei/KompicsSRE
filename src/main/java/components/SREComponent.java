@@ -40,6 +40,7 @@ public class SREComponent extends ComponentDefinition {
 		subscribe(slDeleteH, slReq);
 	}
 	
+	
 	Handler<StorletLoadingFault> faultH = new Handler<StorletLoadingFault>(){
 		public void handle(StorletLoadingFault fault) {
 			//System.out.println(fault.getSlID());
@@ -91,6 +92,7 @@ public class SREComponent extends ComponentDefinition {
 			if (!storletQueue.containsKey(syncAct.getStorlet_name())) {
 				logger.info("storlet not exists");
 				storletWrapper = create(StorletWrapper.class);
+				subscribe(faultH, storletWrapper.getControl());
 				storletQueue.put(syncAct.getStorlet_name(), storletWrapper);
 				logger.info("storlet wrapper created, storlet instantiating");
 				trigger(new StorletInit(syncAct.getStorlet_name()),

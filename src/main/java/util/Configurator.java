@@ -4,8 +4,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-import constant.SREConst;
-
 public class Configurator {
 	private static Properties prop = new Properties();
 	private static String root = "";
