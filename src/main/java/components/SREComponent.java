@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import porttypes.SlRequest;
 import eu.visioncloud.storlet.common.Utils;
+import events.MyTimeout;
 import events.SlDelete;
 import events.StorletLoadingFault;
 import events.SyncTrigger;
@@ -20,6 +21,8 @@ import se.sics.kompics.ComponentDefinition;
 import se.sics.kompics.Fault;
 import se.sics.kompics.Handler;
 import se.sics.kompics.Negative;
+import se.sics.kompics.timer.java.JavaTimer;
+import se.sics.kompics.timer.Timer;
 import util.Configurator;
 
 public class SREComponent extends ComponentDefinition {
@@ -54,7 +57,7 @@ public class SREComponent extends ComponentDefinition {
 			}
 		}
 	};
-
+	
 	Handler<AsyncTrigger> slTriggerH = new Handler<AsyncTrigger>() {
 		public void handle(AsyncTrigger slEvent) {
 			logger.info("received an Async Trigger with slID: "
@@ -64,6 +67,8 @@ public class SREComponent extends ComponentDefinition {
 			if (!storletQueue.containsKey(slEvent.getSlID())) {
 				logger.info("storlet not exists");
 				storletWrapper = create(StorletWrapper.class);
+				Component timer = create(JavaTimer.class);
+				connect(storletWrapper.getNegative(Timer.class),timer.getPositive(Timer.class));
 				subscribe(faultH, storletWrapper.getControl());
 				storletQueue.put(slEvent.getSlID(), storletWrapper);
 				// Increament();
@@ -92,6 +97,8 @@ public class SREComponent extends ComponentDefinition {
 			if (!storletQueue.containsKey(syncAct.getStorlet_name())) {
 				logger.info("storlet not exists");
 				storletWrapper = create(StorletWrapper.class);
+				Component timer = create(JavaTimer.class);
+				connect(storletWrapper.getNegative(Timer.class),timer.getPositive(Timer.class));
 				subscribe(faultH, storletWrapper.getControl());
 				storletQueue.put(syncAct.getStorlet_name(), storletWrapper);
 				logger.info("storlet wrapper created, storlet instantiating");

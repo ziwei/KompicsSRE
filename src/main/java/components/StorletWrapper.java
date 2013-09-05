@@ -27,9 +27,9 @@ import se.sics.kompics.Positive;
 import se.sics.kompics.Start;
 import se.sics.kompics.timer.CancelTimeout;
 import se.sics.kompics.timer.ScheduleTimeout;
-import se.sics.kompics.timer.Timeout;
 import se.sics.kompics.timer.Timer;
 import util.Configurator;
+import util.FakeCCIClient;
 
 
 import java.net.Socket;
@@ -55,6 +55,7 @@ public class StorletWrapper extends ComponentDefinition {
 	public static Map<String, AsyncTrigger> actLogTable = new HashMap<String, AsyncTrigger>();
 	
 	private static ClientInterface oClient;
+	
 	private static final Logger logger = Logger.getLogger(StorletWrapper.class);
 	//private static final Logger benchLogger = Logger.getLogger("benchmark");
 	//private static final JavaSysMon sysMon = new JavaSysMon();
@@ -79,6 +80,7 @@ public class StorletWrapper extends ComponentDefinition {
 		subscribe(handleStop, control);
 		subscribe(slAsyncTriggerH, slReq);
 		subscribe(slSyncTriggerH, slReq);
+		subscribe(handleTimtout, timer);
 	}
 	
 
@@ -88,7 +90,7 @@ public class StorletWrapper extends ComponentDefinition {
 //				startMem = sysMon.physical().getFreeBytes();
 //				started = true;
 //			}
-			logger.info("loading storlet with slID: "+init.getSlID());
+			logger.info("Init phase, loading storlet with slID: "+init.getSlID());
 			storlet = loadStorlet(init.getSlID());
 			
 			//logger.info("storlet with slID: "+init.getSlID()+" loaded");
@@ -102,7 +104,8 @@ public class StorletWrapper extends ComponentDefinition {
 		@Override
 		public void handle(Start event) {
 			// TODO Auto-generated method stub
-			long delay = 5000;
+			logger.info("Start phase");
+			long delay = 500;
 			ScheduleTimeout st = new ScheduleTimeout(delay);
 			st.setTimeoutEvent(new MyTimeout(st));
 			timeoutId = st.getTimeoutEvent().getTimeoutId();
@@ -127,6 +130,7 @@ public class StorletWrapper extends ComponentDefinition {
 		public void handle(MyTimeout event) {
 			// TODO Auto-generated method stub
 			System.out.println("the execution timeout");
+			
 		}
 		
 	};
@@ -176,7 +180,9 @@ public class StorletWrapper extends ComponentDefinition {
 				logger.info("Sync triggering storlet with slName: "+trigger.getSyncAct().getStorlet_name() +
 						" port: "+trigger.getSyncAct().getPort() + " params: "+trigger.getSyncAct().getParameter());
 				SyncOutputStream os = new SyncOutputStream(new Socket("localhost", trigger.getSyncAct().getPort()));
+				scheduleTimer();
 				storlet.get(os, trigger.getSyncAct().getParameter());
+				trigger(new CancelTimeout(timeoutId), timer);
 				logger.info("Sync triggering storlet with slName: "+trigger.getSyncAct().getStorlet_name() +" completed");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -189,11 +195,19 @@ public class StorletWrapper extends ComponentDefinition {
 		}
 	};
 	
+	private void scheduleTimer(){
+		long delay = 50;
+		ScheduleTimeout st = new ScheduleTimeout(delay);
+		st.setTimeoutEvent(new MyTimeout(st));
+		timeoutId = st.getTimeoutEvent().getTimeoutId();
+		trigger(st, timer);
+	}
+	
 	private Storlet loadStorlet(String slID) {
 		
 		//long startTime = System.currentTimeMillis();
 		//MemoryStats startMs = sysMon.physical();
-		
+		//System.out.println("loading");
 		Storlet storlet = null;
 		
 		File workFolder = new File(Configurator.config("slFolderPath") + File.separator
@@ -210,10 +224,12 @@ public class StorletWrapper extends ComponentDefinition {
 				+ "]\n\t\t" + Arrays.toString(workFolder.listFiles()));
 
 		try {
-			Map<String, Object> slMD = oClient.getObjectMetadataEntries(
-					storletInstanceId.getTenantName(),
-					storletInstanceId.getContainerName(),
-					storletInstanceId.getObjectName());
+//			Map<String, Object> slMD = oClient.getObjectMetadataEntries(
+//					storletInstanceId.getTenantName(),
+//					storletInstanceId.getContainerName(),
+//					storletInstanceId.getObjectName());
+			//fake cciclient for testing
+			Map<String, Object> slMD = FakeCCIClient.getObjectMetadataEntries("");
 			// TODO temp, remove
 			ObjIdentifier storletDefinitionId = ObjIdentifier
 					.createFromString((String)slMD
@@ -225,15 +241,17 @@ public class StorletWrapper extends ComponentDefinition {
 			
 			// check if code is stored in a different object
 			// if yes download it and store in work folder
-			logger.info(storletDefinitionId.toString()+" "+storletInstanceId.toString());
+			
 			if (!storletDefinitionId.equals(storletInstanceId)) {
 				// Encoded String Stream
 				
-				InputStream slDefinitionContentEncodedStream = oClient
-						.getObjectContentsAsStream(
-								storletDefinitionId.getTenantName(),
-								storletDefinitionId.getContainerName(),
-								storletDefinitionId.getObjectName());
+//				InputStream slDefinitionContentEncodedStream = oClient
+//						.getObjectContentsAsStream(
+//								storletDefinitionId.getTenantName(),
+//								storletDefinitionId.getContainerName(),
+//								storletDefinitionId.getObjectName());
+				// Fake cciclient for testing
+				InputStream slDefinitionContentEncodedStream = FakeCCIClient.getObjectContentsAsStream("");
 				Utils.extractJarContents(
 						Utils.decodeStream(slDefinitionContentEncodedStream),
 						workFolder.getAbsolutePath());
@@ -252,12 +270,14 @@ public class StorletWrapper extends ComponentDefinition {
 			}
 
 			// ------------get the data-----------------
-			InputStream slInstanceContentEncodedStream = oClient
-					.getObjectContentsAsStream(
-							storletInstanceId.getTenantName(),
-							storletInstanceId.getContainerName(),
-							storletInstanceId.getObjectName());
+//			InputStream slInstanceContentEncodedStream = oClient
+//					.getObjectContentsAsStream(
+//							storletInstanceId.getTenantName(),
+//							storletInstanceId.getContainerName(),
+//							storletInstanceId.getObjectName());
+			InputStream slInstanceContentEncodedStream = FakeCCIClient.getObjectContentsAsStream("");
 			// IMPORTANT: Storlet files will overwrite Definition files
+			logger.info(slInstanceContentEncodedStream.toString());
 			Utils.extractJarContents(
 					Utils.decodeStream(slInstanceContentEncodedStream),
 					workFolder.getAbsolutePath());
@@ -282,6 +302,7 @@ public class StorletWrapper extends ComponentDefinition {
 			Class<? extends Storlet> storletClass = (Class<? extends Storlet>) Utils
 					.loadStorletClass(jarFile, slCodeType);
 			logger.info("storlet class loaded: " + storletClass.getName());
+			
 			storlet = Storlet.createStorlet(storletClass, workFolder,
 					Configurator.config("contentCentricUrl"));
 			long endTime = System.currentTimeMillis();

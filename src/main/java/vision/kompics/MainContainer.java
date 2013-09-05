@@ -21,8 +21,8 @@ import web.SREJettyWebServerInit;
 
 public class MainContainer extends ComponentDefinition {
 	public static void main(String[] args) {
-		Configurator.init(args[0], args[1]);
-		//Configurator.init("/home/ziwei/workspace/KompicsSRE/deployment/", "SREEnv.config");
+		//Configurator.init(args[0], args[1]);
+		Configurator.init("/home/ziwei/workspace/KompicsSRE/deployment/", "SREEnv.config");
 		//PropertyConfigurator.configure(args[1]);
 		Kompics.createAndStart(MainContainer.class, Integer.parseInt(Configurator.config("workers")));
 	}
