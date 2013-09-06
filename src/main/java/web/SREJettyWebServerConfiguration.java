@@ -29,7 +29,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
-import util.Configurator;
+import constant.SREConst;
+
 
 /**
  * The <code>JettyWebServerConfiguration</code> class.
@@ -48,15 +49,15 @@ public final class SREJettyWebServerConfiguration {
 	public SREJettyWebServerConfiguration(){
 		super();
 		try {
-			ip = InetAddress.getByName(Configurator.config("server.ip"));
+			ip = InetAddress.getByName(SREConst.ip);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		port = Integer.parseInt(Configurator.config("server.port"));
-		requestTimeout = Long.parseLong(Configurator.config("request.timeout"));
-		maxThreads = Integer.parseInt(Configurator.config("threads.max"));
-		homePage = Configurator.config("home.page");
+		port = Integer.parseInt(SREConst.port);
+		requestTimeout = Long.parseLong(SREConst.timeout);
+		maxThreads = Integer.parseInt(SREConst.threads);
+		homePage = "";
 	}
 
 	public SREJettyWebServerConfiguration(InetAddress ip, int port,

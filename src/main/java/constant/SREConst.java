@@ -23,10 +23,21 @@ public class SREConst {
 	public static final String jarFolderPath = prop
 			.getProperty("jarFolderPath");
 	public static final String slFolderPath = prop.getProperty("slFolderPath");
-	//public static final String logFilePath = logProp.getProperty("log4j.appender.stdout.File");
+	public static final String logFilePath = prop.getProperty("logFilePath");
 	
 	public static final String ccsURL = prop.getProperty("ccsURL");
 	public static final String objsURL = prop.getProperty("objsURL");
+	
+	public static final String user = prop.getProperty("user");
+	public static final String tenant = prop.getProperty("tenant");
+	public static final String password = prop.getProperty("password");
+	
+	public static final String workerNumber = prop.getProperty("workerNumber");
+	
+	public static final String ip = prop.getProperty("ip");
+	public static final String port = prop.getProperty("port");
+	public static final String timeout = prop.getProperty("timeout");
+	public static final String threads = prop.getProperty("threads");
 	
 	public static final boolean noCache = "true".equals(prop.getProperty("noCache"));
 

@@ -3,13 +3,18 @@ package components;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import msgTypes.SyncSLActivation;
 
 import org.apache.log4j.Logger;
 
+import constant.SREConst;
+
+import porttypes.ExeStatus;
 import porttypes.SlRequest;
 import eu.visioncloud.storlet.common.Utils;
+import events.ExecutionInfo;
 import events.MyTimeout;
 import events.SlDelete;
 import events.StorletLoadingFault;
@@ -21,14 +26,19 @@ import se.sics.kompics.ComponentDefinition;
 import se.sics.kompics.Fault;
 import se.sics.kompics.Handler;
 import se.sics.kompics.Negative;
+import se.sics.kompics.Positive;
 import se.sics.kompics.timer.java.JavaTimer;
+import se.sics.kompics.timer.CancelTimeout;
+import se.sics.kompics.timer.ScheduleTimeout;
 import se.sics.kompics.timer.Timer;
-import util.Configurator;
 
 public class SREComponent extends ComponentDefinition {
 
 	Negative<SlRequest> slReq = negative(SlRequest.class);
+	Positive<Timer> timer = positive(Timer.class);
+	
 	private Map<String, Component> storletQueue;
+	private Map<String, UUID> timeoutIds;
 	private static final Logger logger = Logger.getLogger(SREComponent.class);
 
 	//int counter = 0;
@@ -38,11 +48,36 @@ public class SREComponent extends ComponentDefinition {
 	public SREComponent() {
 		//PropertyConfigurator.configure("log4j.properties");
 		storletQueue = new HashMap<String, Component>();
+		timeoutIds = new HashMap<String, UUID>();
 		subscribe(slTriggerH, slReq);
 		subscribe(slSyncH, slReq);
 		subscribe(slDeleteH, slReq);
+		subscribe(handleTimtout, timer);
 	}
 	
+	Handler<MyTimeout> handleTimtout = new Handler<MyTimeout>() {
+
+		@Override
+		public void handle(MyTimeout event) {
+			// TODO Auto-generated method stub
+			System.out.println("the execution of " + event.getSlID()+"."+event.getHandler()+" timeout");
+			
+		}
+		
+	};
+	
+	Handler<ExecutionInfo> handlerExeEvent = new Handler<ExecutionInfo>() {
+
+		@Override
+		public void handle(ExecutionInfo event) {
+			// TODO Auto-generated method stub
+			if (event.getStatus().equals("start"))
+				scheduleTimer(5000, event.getSlID(), event.getHandler());
+			else if (event.getStatus().equals("stop"))
+				trigger(new CancelTimeout(timeoutIds.get(event.getSlID()+event.getHandler())), timer);
+		}
+		
+	};
 	
 	Handler<StorletLoadingFault> faultH = new Handler<StorletLoadingFault>(){
 		public void handle(StorletLoadingFault fault) {
@@ -51,7 +86,7 @@ public class SREComponent extends ComponentDefinition {
 			if (null != delSl) {
 				destroy(delSl);
 				storletQueue.remove(fault.getSlID());
-				File workFolder = new File(Configurator.getRoot() + Configurator.config("slFolderPath")
+				File workFolder = new File(SREConst.slFolderPath
 						+ File.separator + fault.getSlID());
 				Utils.deleteFileOrDirectory(workFolder);
 			}
@@ -67,9 +102,8 @@ public class SREComponent extends ComponentDefinition {
 			if (!storletQueue.containsKey(slEvent.getSlID())) {
 				logger.info("storlet not exists");
 				storletWrapper = create(StorletWrapper.class);
-				Component timer = create(JavaTimer.class);
-				connect(storletWrapper.getNegative(Timer.class),timer.getPositive(Timer.class));
 				subscribe(faultH, storletWrapper.getControl());
+				subscribe(handlerExeEvent, storletWrapper.getNegative(ExeStatus.class));
 				storletQueue.put(slEvent.getSlID(), storletWrapper);
 				// Increament();
 				// trigger(new StorletInit(slEvent.getSlID()+counter),
@@ -97,8 +131,6 @@ public class SREComponent extends ComponentDefinition {
 			if (!storletQueue.containsKey(syncAct.getStorlet_name())) {
 				logger.info("storlet not exists");
 				storletWrapper = create(StorletWrapper.class);
-				Component timer = create(JavaTimer.class);
-				connect(storletWrapper.getNegative(Timer.class),timer.getPositive(Timer.class));
 				subscribe(faultH, storletWrapper.getControl());
 				storletQueue.put(syncAct.getStorlet_name(), storletWrapper);
 				logger.info("storlet wrapper created, storlet instantiating");
@@ -121,13 +153,19 @@ public class SREComponent extends ComponentDefinition {
 			if (null != delSl) {
 				destroy(delSl);
 				storletQueue.remove(slEvent.getSlID());
-				File workFolder = new File(Configurator.config("slFolderPath")
+				File workFolder = new File(SREConst.slFolderPath
 						+ File.separator + slEvent.getSlID());
 				Utils.deleteFileOrDirectory(workFolder);
 			}
 		}
 	};
-
+	private void scheduleTimer(long delay, String slID, String handler){
+		ScheduleTimeout st = new ScheduleTimeout(delay);
+		st.setTimeoutEvent(new MyTimeout(st, slID, handler));
+		UUID timeoutId = st.getTimeoutEvent().getTimeoutId();
+		timeoutIds.put(slID+handler, timeoutId);
+		trigger(st, timer);
+	}
 //	private synchronized void Increament() {
 //		counter++;
 //	}

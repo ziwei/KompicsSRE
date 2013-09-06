@@ -15,10 +15,12 @@ import eu.visioncloud.storlet.common.StorletException;
 import eu.visioncloud.storlet.common.SyncOutputStream;
 import eu.visioncloud.storlet.common.Utils;
 import events.AsyncTrigger;
+import events.ExecutionInfo;
 import events.MyTimeout;
 import events.StorletInit;
 import events.StorletLoadingFault;
 import events.SyncTrigger;
+import porttypes.ExeStatus;
 import porttypes.SlRequest;
 import se.sics.kompics.ComponentDefinition;
 import se.sics.kompics.Handler;
@@ -28,9 +30,9 @@ import se.sics.kompics.Start;
 import se.sics.kompics.timer.CancelTimeout;
 import se.sics.kompics.timer.ScheduleTimeout;
 import se.sics.kompics.timer.Timer;
-import util.Configurator;
 import util.FakeCCIClient;
-
+import util.MemoryWarningSystem;
+import util.MemoryWarningSystem.Listener;
 
 import java.net.Socket;
 import java.util.Arrays;
@@ -42,11 +44,16 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import constant.SREConst;
+
+//memory management
+
+
 
 public class StorletWrapper extends ComponentDefinition {
 	Negative<SlRequest> slReq = negative(SlRequest.class);
-	Positive<Timer> timer = positive(Timer.class);
-	UUID timeoutId;
+	Positive<ExeStatus> exeStatus = positive(ExeStatus.class);
+	
 	//private static boolean started = false;
 	//private static int loadedSl = 0;//for benchmarking
 	private Storlet storlet;
@@ -62,10 +69,10 @@ public class StorletWrapper extends ComponentDefinition {
 	//private static long startMem = sysMon.physical().getFreeBytes();
 	
 	static{
-		String storageServiceUrl = Configurator.config("storageServiceUrl");
-		if (Configurator.config("tenant") != null || Configurator.config("user") != null
-				|| Configurator.config("password") != null){
-		AuthToken authToken = new AuthToken(Configurator.config("tenant"), Configurator.config("user"), Configurator.config("password"));
+		String storageServiceUrl = SREConst.objsURL;
+		if (SREConst.user != null && SREConst.tenant != null
+				&& SREConst.password != null){
+		AuthToken authToken = new AuthToken(SREConst.user, SREConst.tenant, SREConst.password);
 		oClient = new CdmiRestClient(storageServiceUrl, authToken.getAuthenticationString());
 		}
 		else{
@@ -76,11 +83,9 @@ public class StorletWrapper extends ComponentDefinition {
 	public StorletWrapper() {
 		//PropertyConfigurator.configure("log4j.properties");
 		subscribe(handleInit, control);
-		subscribe(handleStart, control);
-		subscribe(handleStop, control);
 		subscribe(slAsyncTriggerH, slReq);
 		subscribe(slSyncTriggerH, slReq);
-		subscribe(handleTimtout, timer);
+		
 	}
 	
 
@@ -99,41 +104,7 @@ public class StorletWrapper extends ComponentDefinition {
 		}
 	};
 	
-	private Handler<Start> handleStart = new Handler<Start>() {//cancel when stop?
-
-		@Override
-		public void handle(Start event) {
-			// TODO Auto-generated method stub
-			logger.info("Start phase");
-			long delay = 500;
-			ScheduleTimeout st = new ScheduleTimeout(delay);
-			st.setTimeoutEvent(new MyTimeout(st));
-			timeoutId = st.getTimeoutEvent().getTimeoutId();
-			trigger(st, timer);
-		}
-		
-	};
 	
-	private Handler<Start> handleStop = new Handler<Start>() {//cancel when stop?
-
-		@Override
-		public void handle(Start event) {
-			// TODO Auto-generated method stub
-			trigger(new CancelTimeout(timeoutId), timer);
-		}
-		
-	};
-	
-	Handler<MyTimeout> handleTimtout = new Handler<MyTimeout>() {
-
-		@Override
-		public void handle(MyTimeout event) {
-			// TODO Auto-generated method stub
-			System.out.println("the execution timeout");
-			
-		}
-		
-	};
 
 	Handler<AsyncTrigger> slAsyncTriggerH = new Handler<AsyncTrigger>() {
 
@@ -148,9 +119,10 @@ public class StorletWrapper extends ComponentDefinition {
 			try {
 				logger.info("Activation: "+trigger.getActId()+". Async triggering storlet with slID: "+trigger.getSlID() +" by handler: " + trigger.getHandlerId());
 				//long startTime = System.currentTimeMillis();
+				trigger(new ExecutionInfo("start",trigger.getSlID(), trigger.getHandlerId()), exeStatus);
 				storlet.getTriggerHandler(trigger.getHandlerId()).execute(
 						trigger.getEventModel());
-				
+				trigger(new ExecutionInfo("stop",trigger.getSlID(), trigger.getHandlerId()), exeStatus);
 				if (slLogTable.containsKey(trigger.getSlID())){
 					Set set = slLogTable.get(trigger.getSlID());
 					set.add(trigger.getActId());
@@ -167,6 +139,7 @@ public class StorletWrapper extends ComponentDefinition {
 				//trigger.getSlID() +" by handler: " + trigger.getHandlerId()+" completed, "+"duration: "+ (endTime-startTime) + " Misec");
 			} catch (StorletException e) {
 				// TODO Auto-generated catch block
+				trigger(new ExecutionInfo("start",trigger.getSlID(), trigger.getHandlerId()), exeStatus);
 				e.printStackTrace();
 			}
 
@@ -180,28 +153,34 @@ public class StorletWrapper extends ComponentDefinition {
 				logger.info("Sync triggering storlet with slName: "+trigger.getSyncAct().getStorlet_name() +
 						" port: "+trigger.getSyncAct().getPort() + " params: "+trigger.getSyncAct().getParameter());
 				SyncOutputStream os = new SyncOutputStream(new Socket("localhost", trigger.getSyncAct().getPort()));
-				scheduleTimer();
+				//scheduleTimer();
+//				MemoryWarningSystem system = new MemoryWarningSystem();
+//				system.addListener(new Listener() {
+//			        @Override
+//			        public void memoryUsageLow(long consumedMemory) {
+//			            System.out.println("concumed: "+consumedMemory);
+//			        }
+//			    });
+				trigger(new ExecutionInfo("start",trigger.getSyncAct().getStorlet_name(), "Sync"), exeStatus);
 				storlet.get(os, trigger.getSyncAct().getParameter());
-				trigger(new CancelTimeout(timeoutId), timer);
-				logger.info("Sync triggering storlet with slName: "+trigger.getSyncAct().getStorlet_name() +" completed");
+				trigger(new ExecutionInfo("stop",trigger.getSyncAct().getStorlet_name(), "Sync"), exeStatus);
+				
+				//trigger(new CancelTimeout(timeoutId), timer);
+				//logger.info("Sync triggering storlet with slName: "+trigger.getSyncAct().getStorlet_name() +" completed");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
+				trigger(new ExecutionInfo("stop",trigger.getSyncAct().getStorlet_name(), "Sync"), exeStatus);
 				e.printStackTrace();
 			} catch (StorletException e) {
 				// TODO Auto-generated catch block
+				trigger(new ExecutionInfo("stop",trigger.getSyncAct().getStorlet_name(), "Sync"), exeStatus);
 				e.printStackTrace();
 			}
 
 		}
 	};
 	
-	private void scheduleTimer(){
-		long delay = 50;
-		ScheduleTimeout st = new ScheduleTimeout(delay);
-		st.setTimeoutEvent(new MyTimeout(st));
-		timeoutId = st.getTimeoutEvent().getTimeoutId();
-		trigger(st, timer);
-	}
+	
 	
 	private Storlet loadStorlet(String slID) {
 		
@@ -210,7 +189,7 @@ public class StorletWrapper extends ComponentDefinition {
 		//System.out.println("loading");
 		Storlet storlet = null;
 		
-		File workFolder = new File(Configurator.config("slFolderPath") + File.separator
+		File workFolder = new File(SREConst.slFolderPath + File.separator
 				+ slID);
 		Utils.deleteFileOrDirectory(workFolder);
 		workFolder.mkdirs();
@@ -304,7 +283,7 @@ public class StorletWrapper extends ComponentDefinition {
 			logger.info("storlet class loaded: " + storletClass.getName());
 			
 			storlet = Storlet.createStorlet(storletClass, workFolder,
-					Configurator.config("contentCentricUrl"));
+					SREConst.ccsURL);
 			long endTime = System.currentTimeMillis();
 			//CpuTimes endCpuTimes = sysMon.cpuTimes();
 			logger.info("load the storlet cost " + (endTime-startTime));

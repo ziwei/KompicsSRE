@@ -28,6 +28,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.lf5.util.StreamUtils;
 
 import components.StorletWrapper;
+import constant.SREConst;
 
 import porttypes.SlRequest;
 
@@ -44,7 +45,6 @@ import se.sics.kompics.Positive;
 import se.sics.kompics.web.Web;
 import se.sics.kompics.web.jetty.JettyWebServerConfiguration;
 import se.sics.kompics.web.jetty.JettyWebServerInit;
-import util.Configurator;
 
 public final class SREJettyWebServer extends ComponentDefinition {
 
@@ -53,18 +53,13 @@ public final class SREJettyWebServer extends ComponentDefinition {
 
 	private static final Logger logger = Logger
 			.getLogger(SREJettyWebServer.class);
-	private static final String logDir = Configurator.getRoot()+Configurator.config("logDir");
+	private static final String logDir = SREConst.logFilePath;
 
 	private final SREJettyWebServer thisWS = this;
 	
 
 	public SREJettyWebServer() {
-		try {
-			PropertyConfigurator.configure(new URL("file://" + Configurator.getRoot() + Configurator.config("logProp")));
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		PropertyConfigurator.configure(SREJettyWebServer.class.getResource("/log4j.properties"));
 		subscribe(handleInit, control);
 	}
 
