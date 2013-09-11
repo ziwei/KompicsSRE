@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import components.SREComponent;
 import constant.SREConst;
-
 import porttypes.SlRequest;
 
 import se.sics.kompics.Component;
@@ -21,12 +20,15 @@ public class MainContainer extends ComponentDefinition {
 	public static void main(String[] args) {
 		//PropertyConfigurator.configure(args[1]);
 		Kompics.createAndStart(MainContainer.class, Integer.parseInt(SREConst.workerNumber));
+		//Kompics.shutdown();
 	}
-
+	Component webServer;
+	Component sre;
+	Component timer;
 	public MainContainer() throws IOException {
-		Component webServer = create(SREJettyWebServer.class);
-		Component sre = create(SREComponent.class);
-		Component timer = create(JavaTimer.class);
+		webServer = create(SREJettyWebServer.class);
+		sre = create(SREComponent.class);
+		timer = create(JavaTimer.class);
 		SREJettyWebServerInit init = new SREJettyWebServerInit(
 				new SREJettyWebServerConfiguration());
 		connect(sre.getPositive(SlRequest.class),
@@ -36,4 +38,5 @@ public class MainContainer extends ComponentDefinition {
 		trigger(init, webServer.getControl());
 		
 	}
+
 }

@@ -25,7 +25,6 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.thread.QueuedThreadPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.lf5.util.StreamUtils;
 
 import components.StorletWrapper;
 import constant.SREConst;
@@ -122,6 +121,7 @@ public final class SREJettyWebServer extends ComponentDefinition {
 			} else if (method.equals("GET")) {
 				if (args[2].equals("stop")) {
 					Kompics.shutdown();
+					System.exit(0);
 				}
 				else if (args.length == 3) {
 					String targetLog = args[2];

@@ -36,17 +36,17 @@ public class SREComponent extends ComponentDefinition {
 
 	Negative<SlRequest> slReq = negative(SlRequest.class);
 	Positive<Timer> timer = positive(Timer.class);
-	
+
 	private Map<String, Component> storletQueue;
 	private Map<String, UUID> timeoutIds;
 	private static final Logger logger = Logger.getLogger(SREComponent.class);
 
-	//int counter = 0;
-	//private static final Logger benchLogger = Logger.getLogger("benchmark");
-	//private static final JavaSysMon sysMon = new JavaSysMon();
-	
+	// int counter = 0;
+	// private static final Logger benchLogger = Logger.getLogger("benchmark");
+	// private static final JavaSysMon sysMon = new JavaSysMon();
+
 	public SREComponent() {
-		//PropertyConfigurator.configure("log4j.properties");
+		// PropertyConfigurator.configure("log4j.properties");
 		storletQueue = new HashMap<String, Component>();
 		timeoutIds = new HashMap<String, UUID>();
 		subscribe(slTriggerH, slReq);
@@ -54,34 +54,39 @@ public class SREComponent extends ComponentDefinition {
 		subscribe(slDeleteH, slReq);
 		subscribe(handleTimtout, timer);
 	}
-	
+
 	Handler<MyTimeout> handleTimtout = new Handler<MyTimeout>() {
 
 		@Override
 		public void handle(MyTimeout event) {
 			// TODO Auto-generated method stub
-			System.out.println("the execution of " + event.getSlID()+"."+event.getHandler()+" timeout");
-			
+			System.out.println("the execution of " + event.getSlID() + "."
+					+ event.getHandler() + " timeout");
+
 		}
-		
+
 	};
-	
+
 	Handler<ExecutionInfo> handlerExeEvent = new Handler<ExecutionInfo>() {
 
 		@Override
 		public void handle(ExecutionInfo event) {
 			// TODO Auto-generated method stub
-			if (event.getStatus().equals("start"))
-				scheduleTimer(5000, event.getSlID(), event.getHandler());
-			else if (event.getStatus().equals("stop"))
-				trigger(new CancelTimeout(timeoutIds.get(event.getSlID()+event.getHandler())), timer);
+			if (event.getTimeConstraint() != -1) {
+				if (event.getStatus().equals("start"))
+					scheduleTimer(event.getTimeConstraint(), event.getSlID(),
+							event.getHandler());
+				else if (event.getStatus().equals("stop"))
+					trigger(new CancelTimeout(timeoutIds.get(event.getSlID()
+							+ event.getHandler())), timer);
+			}
 		}
-		
+
 	};
-	
-	Handler<StorletLoadingFault> faultH = new Handler<StorletLoadingFault>(){
+
+	Handler<StorletLoadingFault> faultH = new Handler<StorletLoadingFault>() {
 		public void handle(StorletLoadingFault fault) {
-			//System.out.println(fault.getSlID());
+			// System.out.println(fault.getSlID());
 			Component delSl = storletQueue.get(fault.getSlID());
 			if (null != delSl) {
 				destroy(delSl);
@@ -92,7 +97,7 @@ public class SREComponent extends ComponentDefinition {
 			}
 		}
 	};
-	
+
 	Handler<AsyncTrigger> slTriggerH = new Handler<AsyncTrigger>() {
 		public void handle(AsyncTrigger slEvent) {
 			logger.info("received an Async Trigger with slID: "
@@ -103,7 +108,8 @@ public class SREComponent extends ComponentDefinition {
 				logger.info("storlet not exists");
 				storletWrapper = create(StorletWrapper.class);
 				subscribe(faultH, storletWrapper.getControl());
-				subscribe(handlerExeEvent, storletWrapper.getNegative(ExeStatus.class));
+				subscribe(handlerExeEvent,
+						storletWrapper.getNegative(ExeStatus.class));
 				storletQueue.put(slEvent.getSlID(), storletWrapper);
 				// Increament();
 				// trigger(new StorletInit(slEvent.getSlID()+counter),
@@ -118,7 +124,7 @@ public class SREComponent extends ComponentDefinition {
 				logger.info("storlet loaded");
 			}
 			trigger(slEvent, storletWrapper.getPositive(SlRequest.class));
-			
+
 			logger.info("Async Trigger Event processed");
 		}
 	};
@@ -159,14 +165,15 @@ public class SREComponent extends ComponentDefinition {
 			}
 		}
 	};
-	private void scheduleTimer(long delay, String slID, String handler){
+
+	private void scheduleTimer(long delay, String slID, String handler) {
 		ScheduleTimeout st = new ScheduleTimeout(delay);
 		st.setTimeoutEvent(new MyTimeout(st, slID, handler));
 		UUID timeoutId = st.getTimeoutEvent().getTimeoutId();
-		timeoutIds.put(slID+handler, timeoutId);
+		timeoutIds.put(slID + handler, timeoutId);
 		trigger(st, timer);
 	}
-//	private synchronized void Increament() {
-//		counter++;
-//	}
+	// private synchronized void Increament() {
+	// counter++;
+	// }
 }
