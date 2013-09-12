@@ -148,7 +148,7 @@ public class StorletWrapper extends ComponentDefinition {
 				// TODO Auto-generated catch block
 				trigger(new ExecutionInfo("start", trigger.getSlID(),
 						trigger.getHandlerId(), timeConstraint), exeStatus);
-				e.printStackTrace();
+				logger.error(String.format("Error in async triggering Storlet(%s)", trigger.getSlID()), e);
 			}
 
 		}
@@ -185,12 +185,14 @@ public class StorletWrapper extends ComponentDefinition {
 				// TODO Auto-generated catch block
 				trigger(new ExecutionInfo("stop", trigger.getSyncAct()
 						.getStorlet_name(), "Sync"), exeStatus);
-				e.printStackTrace();
+				logger.error(String.format("Error in sync triggering Storlet(%s)", trigger.getSyncAct()
+						.getStorlet_name()), e);
 			} catch (StorletException e) {
 				// TODO Auto-generated catch block
 				trigger(new ExecutionInfo("stop", trigger.getSyncAct()
 						.getStorlet_name(), "Sync"), exeStatus);
-				e.printStackTrace();
+				logger.error(String.format("Error in sync triggering Storlet(%s)", trigger.getSyncAct()
+						.getStorlet_name()), e);
 			}
 
 		}
@@ -349,10 +351,10 @@ public class StorletWrapper extends ComponentDefinition {
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info(e.getMessage());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info(e.getMessage());
 		}
 		return params;
 	}
