@@ -117,39 +117,31 @@ public class StorletWrapper extends ComponentDefinition {
 				logger.info("Won't execute trigger since storlet loading failed");
 				return;
 			}
+			logger.info("Activation: " + trigger.getActId()
+					+ ". Async triggering storlet with slID: "
+					+ trigger.getSlID() + " by handler: "
+					+ trigger.getHandlerId());
+			// long startTime = System.currentTimeMillis();
+			trigger(new ExecutionInfo("start", trigger.getSlID(),
+					trigger.getHandlerId(), timeConstraint), exeStatus);
 			try {
-				logger.info("Activation: " + trigger.getActId()
-						+ ". Async triggering storlet with slID: "
-						+ trigger.getSlID() + " by handler: "
-						+ trigger.getHandlerId());
-				// long startTime = System.currentTimeMillis();
-				trigger(new ExecutionInfo("start", trigger.getSlID(),
-						trigger.getHandlerId(), timeConstraint), exeStatus);
-				storlet.getTriggerHandler(trigger.getHandlerId()).execute(
-						trigger.getEventModel());
-				trigger(new ExecutionInfo("stop", trigger.getSlID(),
-						trigger.getHandlerId()), exeStatus);
-				if (slLogTable.containsKey(trigger.getSlID())) {
-					Set set = slLogTable.get(trigger.getSlID());
-					set.add(trigger.getActId());
-				} else {
-					Set set = new HashSet();
-					set.add(trigger.getActId());
-					slLogTable.put(trigger.getSlID(), set);
-				}
-				actLogTable.put(trigger.getActId(), trigger);
-
-				// long endTime = System.currentTimeMillis();
-				// logger.info("Activation: "+trigger.getActId()+". Async triggering storlet with slID: "+
-				// trigger.getSlID() +" by handler: " +
-				// trigger.getHandlerId()+" completed, "+"duration: "+
-				// (endTime-startTime) + " Misec");
-			} catch (StorletException e) {
-				// TODO Auto-generated catch block
-				trigger(new ExecutionInfo("start", trigger.getSlID(),
-						trigger.getHandlerId(), timeConstraint), exeStatus);
-				logger.error(String.format("Error in async triggering Storlet(%s)", trigger.getSlID()), e);
+			storlet.getTriggerHandler(trigger.getHandlerId()).execute(
+					trigger.getEventModel());
 			}
+			catch (Exception e){
+				logger.info("storlet execution failed", e);
+			}
+			trigger(new ExecutionInfo("stop", trigger.getSlID(),
+					trigger.getHandlerId()), exeStatus);
+			if (slLogTable.containsKey(trigger.getSlID())) {
+				Set set = slLogTable.get(trigger.getSlID());
+				set.add(trigger.getActId());
+			} else {
+				Set set = new HashSet();
+				set.add(trigger.getActId());
+				slLogTable.put(trigger.getSlID(), set);
+			}
+			actLogTable.put(trigger.getActId(), trigger);
 
 		}
 	};
@@ -282,7 +274,6 @@ public class StorletWrapper extends ComponentDefinition {
 //			InputStream slInstanceContentEncodedStream = FakeCCIClient
 //					.getObjectContentsAsStream("");
 			// IMPORTANT: Storlet files will overwrite Definition files
-			logger.info(slInstanceContentEncodedStream.toString());
 			Utils.extractJarContents(
 					Utils.decodeStream(slInstanceContentEncodedStream),
 					workFolder.getAbsolutePath());
@@ -303,12 +294,13 @@ public class StorletWrapper extends ComponentDefinition {
 			// method, slower
 			// Load storlet class from jar & activate it
 			// load constraints
+			logger.info("storlet class unziped: " + storletInstanceId.toString());
 			Properties constraints = getConstraintsFromFile(workFolder);
 			if (constraints.get("time") != null){
 				System.out.println(constraints.get("time"));
 				timeConstraint = Long.parseLong(constraints.get("time").toString());
 			}
-
+			logger.info("storlet properties loaded: ");
 			long startTime = System.currentTimeMillis();
 			// CpuTimes startCpuTimes = sysMon.cpuTimes();
 			File jarFile = new File(workFolder,

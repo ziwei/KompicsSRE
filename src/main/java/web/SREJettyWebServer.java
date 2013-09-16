@@ -93,6 +93,8 @@ public final class SREJettyWebServer extends ComponentDefinition {
 
 	void handleRequest(String target, org.mortbay.jetty.Request request,
 			HttpServletResponse response) throws IOException {
+		logger.info("received request from " + request.getRemoteAddr() + " : "+ request.getMethod() + " " +
+			request.getLocalAddr()+":"+request.getLocalPort()+target);
 		String method = request.getMethod();
 		String[] args = target.split("/");
 		if (args.length >= 3 && args[1].equals("SRE")) {
@@ -110,14 +112,13 @@ public final class SREJettyWebServer extends ComponentDefinition {
 				if (slID == null) {
 					return;
 				}
-				String header = request.getHeader("Accept");
 				// System.out.println(header);
 				String line;
 				String body = "";
 				while ((line = request.getReader().readLine()) != null) {
 					body = body.concat(line);
 				}
-				generateEvent(method, handler, slID, activationId, header, body);
+				generateEvent(method, handler, slID, activationId, body);
 			} else if (method.equals("GET")) {
 				if (args[2].equals("stop")) {
 					Kompics.shutdown();
@@ -182,19 +183,18 @@ public final class SREJettyWebServer extends ComponentDefinition {
 	}
 
 	private void generateEvent(String method, String handler, String slID,
-			String activationId, String header, String body)
+			String activationId, String body)
 			throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper om = new ObjectMapper();
 		
-		if (method.equals("POST") && !handler.equals("")
-				&& header.equals("application/json")) {
+		if (method.equals("POST") && !handler.equals("")) {
 			logger.info("Handling an Async Trigger with activation id "
 					+ activationId + ", slID " + slID + ", handler " + handler);
 			logger.info("body " + body);
 			EventModel em = om.readValue(body, EventModel.class);
+			logger.info("event model " + em);
 			trigger(new AsyncTrigger(slID, handler, em, activationId), sreWeb);
-		} else if (method.equals("POST") && slID.equals("syncStorlet")
-				&& header.equals("application/json")) {
+		} else if (method.equals("POST") && slID.equals("syncStorlet")) {
 			logger.info("Handling an Sync Trigger");
 			SyncSLActivation syncAct = om.readValue(body,
 					SyncSLActivation.class);

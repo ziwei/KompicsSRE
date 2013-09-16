@@ -60,7 +60,7 @@ public class SREComponent extends ComponentDefinition {
 		@Override
 		public void handle(MyTimeout event) {
 			// TODO Auto-generated method stub
-			System.out.println("the execution of " + event.getSlID() + "."
+			logger.info("the execution of " + event.getSlID() + "."
 					+ event.getHandler() + " timeout");
 
 		}
