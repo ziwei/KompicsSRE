@@ -1,1 +1,0 @@
-curl -i -X POST "localhost:8080/SRE/syncStorlet" -H "Accept: application/json" --data-binary "@syncbody"

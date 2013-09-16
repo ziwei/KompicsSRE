@@ -1,1 +1,0 @@
-curl -i -X POST "http://10.0.1.101:8002/SRE/TestTenant.edt-testChain6.RaiUnzipStorlet/zipupload/123" -H "Accept: application/json" --data-binary "@asyncbody"
