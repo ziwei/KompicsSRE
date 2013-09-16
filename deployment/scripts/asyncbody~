@@ -1,0 +1,12 @@
+{
+"oldMetadata": {},
+"newMetadata":{},
+"rFlag": true,
+
+"objectName": "objectName",
+"containerName": "containerName",
+"position": "10.0.1.101",
+"eventType": "getDObj",
+"tenantName": "tenant",
+"userName": "userName"
+}
