@@ -4,14 +4,14 @@
 
 ### END INIT INFO
 
-ROOT_PATH=/home/ziwei/workspace/KompicsSRE/deployment/
-SRE_JAR=SRE-Kompics.jar
-SRE_CONFIG=SREEnv.config
+ROOT_PATH=/srv/SRE-Kompics/
+SRE_JAR=KompicsSRE.jar
 
 RESPONSE="000"
+URL="http://localhost:8000/SRE/"
 
 sendReqeust(){
-RESPONSE=$(curl --write-out %{http_code} --silent --output /dev/null "http://localhost:8080/SRE/log")
+RESPONSE=$(curl --write-out %{http_code} --silent --output /dev/null "$URL""log")
 }
 
 case "$1" in
@@ -19,8 +19,8 @@ case "$1" in
 	sendReqeust
 	if [ "$RESPONSE" -eq "000" ] || [ "$RESPONSE" -eq "404" ]
 	then
-		export JAVA_OPTS="-D custom.logging.root=$ROOT_PATH"
-		java -jar "$ROOT_PATH$SRE_JAR" "$ROOT_PATH" "$SRE_CONFIG" &
+		export JAVA_OPTS="-D SRERootPath=$ROOT_PATH"
+		java -jar "$ROOT_PATH$SRE_JAR" &
 		echo "starting"
 		sleep 2
 		sendReqeust
@@ -35,7 +35,7 @@ case "$1" in
 	fi
 	;;
   stop)
-	curl "http://localhost:8080/SRE/stop" --silent --output /dev/null
+	curl "$URL""stop" --silent --output /dev/null
 	sleep 2
 	sendReqeust
 	if [ "$RESPONSE" -eq "000" ] || [ "$RESPONSE" -eq "404" ]
