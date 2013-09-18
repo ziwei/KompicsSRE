@@ -17,9 +17,10 @@ import eu.visioncloud.storlet.common.StorletException;
 import eu.visioncloud.storlet.common.SyncOutputStream;
 import eu.visioncloud.storlet.common.TriggerHandler;
 import eu.visioncloud.storlet.common.Utils;
+import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
+
 import events.AsyncTrigger;
 import events.ExecutionInfo;
-import events.MyTimeout;
 import events.StorletInit;
 import events.StorletLoadingFault;
 import events.SyncTrigger;
@@ -29,13 +30,6 @@ import se.sics.kompics.ComponentDefinition;
 import se.sics.kompics.Handler;
 import se.sics.kompics.Negative;
 import se.sics.kompics.Positive;
-import se.sics.kompics.Start;
-import se.sics.kompics.timer.CancelTimeout;
-import se.sics.kompics.timer.ScheduleTimeout;
-import se.sics.kompics.timer.Timer;
-import util.FakeCCIClient;
-import util.MemoryWarningSystem;
-import util.MemoryWarningSystem.Listener;
 
 import java.net.Socket;
 import java.util.Arrays;
@@ -44,19 +38,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
 import constant.SREConst;
 
-//memory management
 
 public class StorletWrapper extends ComponentDefinition {
 	Negative<SlRequest> slReq = negative(SlRequest.class);
 	Positive<ExeStatus> exeStatus = positive(ExeStatus.class);
 
-	// private static boolean started = false;
 	// private static int loadedSl = 0;//for benchmarking
 	private Storlet storlet;
 
@@ -64,7 +55,7 @@ public class StorletWrapper extends ComponentDefinition {
 	public static Map<String, AsyncTrigger> actLogTable = new HashMap<String, AsyncTrigger>();
 
 	private static ClientInterface oClient;
-
+	final VismoEventDispatcher dispatcher = new VismoEventDispatcher("SRE");//can add config file param
 	private static final Logger logger = Logger.getLogger(StorletWrapper.class);
 	// private static final Logger benchLogger = Logger.getLogger("benchmark");
 	// private static final JavaSysMon sysMon = new JavaSysMon();
@@ -129,8 +120,18 @@ public class StorletWrapper extends ComponentDefinition {
 				TriggerHandler th = storlet.getTriggerHandler(trigger
 						.getHandlerId());
 
-				if (th != null)
+				if (th != null){
+					long startTime = System.currentTimeMillis();
 					th.execute(trigger.getEventModel());
+					long endTime = System.currentTimeMillis();
+					ObjIdentifier slID = ObjIdentifier.createFromString(trigger.getSlID());
+					dispatcher.newEvent().field("tenantID", slID.getTenantName()).field("containerID", slID.getContainerName())
+					.field("objectID", slID.getObjectName()).field("end_time", endTime).field("start_time", startTime)
+					.field("count", 1).field("storletType", "STORLET").send();
+					dispatcher.newEvent().field("storletId", trigger.getSlID()).field("end_time", endTime)
+					.field("start_time", startTime).field("objectId", trigger.getEventModel().getObjectName())
+					.field("machineId", trigger.getEventModel().getPosition()).send();
+				}
 				else
 					logger.info("no valid triggers");
 			} catch (Exception e) {
@@ -161,23 +162,21 @@ public class StorletWrapper extends ComponentDefinition {
 						+ trigger.getSyncAct().getParameter());
 				SyncOutputStream os = new SyncOutputStream(new Socket(
 						"localhost", trigger.getSyncAct().getPort()));
-				// scheduleTimer();
-				// MemoryWarningSystem system = new MemoryWarningSystem();
-				// system.addListener(new Listener() {
-				// @Override
-				// public void memoryUsageLow(long consumedMemory) {
-				// System.out.println("concumed: "+consumedMemory);
-				// }
-				// });
 				trigger(new ExecutionInfo("start", trigger.getSyncAct()
 						.getStorlet_name(), "Sync"), exeStatus);
+				long startTime = System.currentTimeMillis();
 				storlet.get(os, trigger.getSyncAct().getParameter());
+				long endTime = System.currentTimeMillis();
+				ObjIdentifier slID = ObjIdentifier.createFromString(trigger.getSyncAct().getStorlet_name());
+				dispatcher.newEvent().field("tenantID", slID.getTenantName()).field("containerID", slID.getContainerName())
+				.field("objectID", slID.getObjectName()).field("end_time", endTime).field("start_time", startTime)
+				.field("count", 1).field("storletType", "STORLET").send();
+				dispatcher.newEvent().field("storletId", trigger.getSyncAct().getStorlet_name()).field("end_time", endTime)
+				.field("start_time", startTime).field("objectId", slID.getObjectName())
+				.field("machineId", SREConst.externalip).send();
 				trigger(new ExecutionInfo("stop", trigger.getSyncAct()
 						.getStorlet_name(), "Sync"), exeStatus);
 
-				// trigger(new CancelTimeout(timeoutId), timer);
-				// logger.info("Sync triggering storlet with slName: "+trigger.getSyncAct().getStorlet_name()
-				// +" completed");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				trigger(new ExecutionInfo("stop", trigger.getSyncAct()
@@ -198,12 +197,7 @@ public class StorletWrapper extends ComponentDefinition {
 	};
 
 	private Storlet loadStorlet(String slID) {
-
-		// long startTime = System.currentTimeMillis();
-		// MemoryStats startMs = sysMon.physical();
-		// System.out.println("loading");
 		Storlet storlet = null;
-
 		File workFolder = new File(SREConst.slFolderPath + File.separator
 				+ slID);
 		Utils.deleteFileOrDirectory(workFolder);
@@ -224,9 +218,6 @@ public class StorletWrapper extends ComponentDefinition {
 					storletInstanceId.getTenantName(),
 					storletInstanceId.getContainerName(),
 					storletInstanceId.getObjectName());
-			// fake cciclient for testing
-			// Map<String, Object> slMD = FakeCCIClient
-			// .getObjectMetadataEntries("");
 			// TODO temp, remove
 			ObjIdentifier storletDefinitionId = ObjIdentifier
 					.createFromString((String) slMD
@@ -235,10 +226,6 @@ public class StorletWrapper extends ComponentDefinition {
 					.get(SPEConstants.STORLET_TAG_CODETYPE);
 
 			// TODO temp, remove
-			// keep the old Object Service unzip jar file API
-
-			// check if code is stored in a different object
-			// if yes download it and store in work folder
 
 			if (!storletDefinitionId.equals(storletInstanceId)) {
 				// Encoded String Stream
@@ -248,9 +235,7 @@ public class StorletWrapper extends ComponentDefinition {
 								storletDefinitionId.getTenantName(),
 								storletDefinitionId.getContainerName(),
 								storletDefinitionId.getObjectName());
-				// Fake cciclient for testing
-				// InputStream slDefinitionContentEncodedStream = FakeCCIClient
-				// .getObjectContentsAsStream("");
+
 				Utils.extractJarContents(
 						Utils.decodeStream(slDefinitionContentEncodedStream),
 						workFolder.getAbsolutePath());
@@ -278,29 +263,11 @@ public class StorletWrapper extends ComponentDefinition {
 							storletInstanceId.getTenantName(),
 							storletInstanceId.getContainerName(),
 							storletInstanceId.getObjectName());
-			// InputStream slInstanceContentEncodedStream = FakeCCIClient
-			// .getObjectContentsAsStream("");
+
 			// IMPORTANT: Storlet files will overwrite Definition files
 			Utils.extractJarContents(
 					Utils.decodeStream(slInstanceContentEncodedStream),
 					workFolder.getAbsolutePath());
-			// long endTime = System.currentTimeMillis();
-			// CpuTimes endCpuTimes = sysMon.cpuTimes();
-			// MemoryStats endMs = sysMon.physical();
-			// TODO temp, remove
-			// byte[] slInstanceContentBytes =
-			// Utils.inputStreamToByteArray(Utils
-			// .decodeStream(slInstanceContentEncodedStream));
-			// logger.info("-----[TEMP]Extracted storlet INSTANCE content for "
-			// + storletInstanceId + " into "
-			// + workFolder.getAbsolutePath() + "\n\t\t[exists="
-			// + workFolder.exists() + ":dir=" + workFolder.isDirectory()
-			// + "]\n\t\t" + Arrays.toString(workFolder.listFiles())
-			// + "\n\t\tSize = " + slInstanceContentBytes.length);
-			// oClient.unzipJar(workFolder.getAbsolutePath());//my unpack
-			// method, slower
-			// Load storlet class from jar & activate it
-			// load constraints
 			logger.info("storlet class unziped: "
 					+ storletInstanceId.toString());
 			Properties constraints = getConstraintsFromFile(workFolder);
@@ -310,7 +277,7 @@ public class StorletWrapper extends ComponentDefinition {
 						.toString());
 			}
 			logger.info("storlet properties loaded: ");
-			long startTime = System.currentTimeMillis();
+			
 			// CpuTimes startCpuTimes = sysMon.cpuTimes();
 			File jarFile = new File(workFolder,
 					SPEConstants.STORLET_CODE_FILENAME);
@@ -320,19 +287,14 @@ public class StorletWrapper extends ComponentDefinition {
 
 			storlet = Storlet.createStorlet(storletClass, workFolder,
 					SREConst.ccsURL);
-			long endTime = System.currentTimeMillis();
+			
 			// CpuTimes endCpuTimes = sysMon.cpuTimes();
-			logger.info("load the storlet cost " + (endTime - startTime));
-			// benchLogger.info((endTime-startTime) + " on " +
-			// slID.substring(26, slID.length()));
-			// benchLogger.info((endMs.getFreeBytes()-startMs.getFreeBytes()));
+			//logger.info("load the storlet cost " + (endTime - startTime));
 
 		} catch (Exception e) {
 			logger.error(String.format("Error in loadStorlet(%s)", slID), e);
 			trigger(new StorletLoadingFault(e, slID), this.control);
 		}
-		// if (!SREConst.noCache)
-		// storletQueue.put(slID, storlet);
 
 		return storlet;
 	}
@@ -359,12 +321,4 @@ public class StorletWrapper extends ComponentDefinition {
 		}
 		return params;
 	}
-	// private synchronized void logAndIncreament(){
-	// loadedSl++;
-	// //if (loadedSl%10 == 1){
-	// long memCost = (startMem - sysMon.physical().getFreeBytes());
-	// benchLogger.info(memCost);
-	// //}
-	//
-	// }
 }
