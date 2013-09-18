@@ -40,7 +40,8 @@ import constant.SREConst;
  */
 public final class SREJettyWebServerConfiguration {
 
-	private InetAddress ip;
+	private InetAddress external_ip;
+	private InetAddress internal_ip;
 	private int port;
 	private long requestTimeout;
 	private int maxThreads;
@@ -49,7 +50,8 @@ public final class SREJettyWebServerConfiguration {
 	public SREJettyWebServerConfiguration(){
 		super();
 		try {
-			ip = InetAddress.getByName(SREConst.ip);
+			external_ip = InetAddress.getByName(SREConst.externalip);
+			internal_ip = InetAddress.getByName(SREConst.internalip);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -60,18 +62,23 @@ public final class SREJettyWebServerConfiguration {
 		homePage = "";
 	}
 
-	public SREJettyWebServerConfiguration(InetAddress ip, int port,
+	public SREJettyWebServerConfiguration(InetAddress eip, InetAddress iip, int port,
 			long requestTimeout, int maxThreads, String homePage) {
 		super();
-		this.ip = ip;
+		this.external_ip = eip;
+		this.internal_ip = iip;
 		this.port = port;
 		this.requestTimeout = requestTimeout;
 		this.maxThreads = maxThreads;
 		this.homePage = homePage;
 	}
 
-	public final InetAddress getIp() {
-		return ip;
+	public final InetAddress getExtIp() {
+		return external_ip;
+	}
+	
+	public final InetAddress getIntIp() {
+		return internal_ip;
 	}
 
 	public final int getPort() {
@@ -90,16 +97,16 @@ public final class SREJettyWebServerConfiguration {
 		return homePage;
 	}
 
-	public void store(String file) throws IOException {
-		Properties p = new Properties();
-		p.setProperty("server.ip", "" + ip.getHostAddress());
-		p.setProperty("server.port", "" + port);
-		p.setProperty("request.timeout", "" + requestTimeout);
-		p.setProperty("threads.max", "" + maxThreads);
-		p.setProperty("home.page", homePage);
-
-		Writer writer = new FileWriter(file);
-		p.store(writer, "se.sics.kompics.web.jetty");
-	}
+//	public void store(String file) throws IOException {
+//		Properties p = new Properties();
+//		p.setProperty("server.ip", "" + ip.getHostAddress());
+//		p.setProperty("server.port", "" + port);
+//		p.setProperty("request.timeout", "" + requestTimeout);
+//		p.setProperty("threads.max", "" + maxThreads);
+//		p.setProperty("home.page", homePage);
+//
+//		Writer writer = new FileWriter(file);
+//		p.store(writer, "se.sics.kompics.web.jetty");
+//	}
 
 }

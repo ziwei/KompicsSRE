@@ -34,7 +34,8 @@ public class SREConst {
 	
 	public static final String workerNumber = prop.getProperty("workerNumber");
 	
-	public static final String ip = prop.getProperty("ip");
+	public static final String externalip = prop.getProperty("externalip");
+	public static final String internalip = prop.getProperty("internalip");
 	public static final String port = prop.getProperty("port");
 	public static final String timeout = prop.getProperty("timeout");
 	public static final String threads = prop.getProperty("threads");

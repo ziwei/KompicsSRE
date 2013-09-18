@@ -74,10 +74,13 @@ public final class SREJettyWebServer extends ComponentDefinition {
 			qtp.setMaxThreads(config.getMaxThreads());
 			qtp.setDaemon(true);
 			server.setThreadPool(qtp);
-			Connector connector = new SelectChannelConnector();
-			connector.setHost(config.getIp().getCanonicalHostName());
-			connector.setPort(config.getPort());
-			server.setConnectors(new Connector[] { connector });
+			Connector ext_connector = new SelectChannelConnector();
+			ext_connector.setHost(config.getExtIp().getCanonicalHostName());
+			ext_connector.setPort(config.getPort());
+			Connector int_connector = new SelectChannelConnector();
+			int_connector.setHost(config.getIntIp().getCanonicalHostName());
+			int_connector.setPort(config.getPort());
+			server.setConnectors(new Connector[] { ext_connector, int_connector });
 			try {
 				org.mortbay.jetty.Handler webHandler = new SREJettyHandler(
 						thisWS);
@@ -120,7 +123,7 @@ public final class SREJettyWebServer extends ComponentDefinition {
 				}
 				generateEvent(method, handler, slID, activationId, body);
 			} else if (method.equals("GET")) {
-				if (args[2].equals("stop")) {
+				if (args[2].equals("stop") && !request.getLocalAddr().equals(SREConst.externalip)) {				
 					Kompics.shutdown();
 					System.exit(0);
 				}

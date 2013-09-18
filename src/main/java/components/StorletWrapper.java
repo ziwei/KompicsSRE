@@ -15,6 +15,7 @@ import eu.visioncloud.storlet.common.SPEConstants;
 import eu.visioncloud.storlet.common.Storlet;
 import eu.visioncloud.storlet.common.StorletException;
 import eu.visioncloud.storlet.common.SyncOutputStream;
+import eu.visioncloud.storlet.common.TriggerHandler;
 import eu.visioncloud.storlet.common.Utils;
 import events.AsyncTrigger;
 import events.ExecutionInfo;
@@ -125,10 +126,14 @@ public class StorletWrapper extends ComponentDefinition {
 			trigger(new ExecutionInfo("start", trigger.getSlID(),
 					trigger.getHandlerId(), timeConstraint), exeStatus);
 			try {
-			storlet.getTriggerHandler(trigger.getHandlerId()).execute(
-					trigger.getEventModel());
-			}
-			catch (Exception e){
+				TriggerHandler th = storlet.getTriggerHandler(trigger
+						.getHandlerId());
+
+				if (th != null)
+					th.execute(trigger.getEventModel());
+				else
+					logger.info("no valid triggers");
+			} catch (Exception e) {
 				logger.info("storlet execution failed", e);
 			}
 			trigger(new ExecutionInfo("stop", trigger.getSlID(),
@@ -177,14 +182,16 @@ public class StorletWrapper extends ComponentDefinition {
 				// TODO Auto-generated catch block
 				trigger(new ExecutionInfo("stop", trigger.getSyncAct()
 						.getStorlet_name(), "Sync"), exeStatus);
-				logger.error(String.format("Error in sync triggering Storlet(%s)", trigger.getSyncAct()
-						.getStorlet_name()), e);
+				logger.error(String.format(
+						"Error in sync triggering Storlet(%s)", trigger
+								.getSyncAct().getStorlet_name()), e);
 			} catch (StorletException e) {
 				// TODO Auto-generated catch block
 				trigger(new ExecutionInfo("stop", trigger.getSyncAct()
 						.getStorlet_name(), "Sync"), exeStatus);
-				logger.error(String.format("Error in sync triggering Storlet(%s)", trigger.getSyncAct()
-						.getStorlet_name()), e);
+				logger.error(String.format(
+						"Error in sync triggering Storlet(%s)", trigger
+								.getSyncAct().getStorlet_name()), e);
 			}
 
 		}
@@ -213,13 +220,13 @@ public class StorletWrapper extends ComponentDefinition {
 				+ "]\n\t\t" + Arrays.toString(workFolder.listFiles()));
 
 		try {
-			 Map<String, Object> slMD = oClient.getObjectMetadataEntries(
-			 storletInstanceId.getTenantName(),
-			 storletInstanceId.getContainerName(),
-			 storletInstanceId.getObjectName());
+			Map<String, Object> slMD = oClient.getObjectMetadataEntries(
+					storletInstanceId.getTenantName(),
+					storletInstanceId.getContainerName(),
+					storletInstanceId.getObjectName());
 			// fake cciclient for testing
-//			Map<String, Object> slMD = FakeCCIClient
-//					.getObjectMetadataEntries("");
+			// Map<String, Object> slMD = FakeCCIClient
+			// .getObjectMetadataEntries("");
 			// TODO temp, remove
 			ObjIdentifier storletDefinitionId = ObjIdentifier
 					.createFromString((String) slMD
@@ -236,14 +243,14 @@ public class StorletWrapper extends ComponentDefinition {
 			if (!storletDefinitionId.equals(storletInstanceId)) {
 				// Encoded String Stream
 
-				 InputStream slDefinitionContentEncodedStream = oClient
-				 .getObjectContentsAsStream(
-				 storletDefinitionId.getTenantName(),
-				 storletDefinitionId.getContainerName(),
-				 storletDefinitionId.getObjectName());
+				InputStream slDefinitionContentEncodedStream = oClient
+						.getObjectContentsAsStream(
+								storletDefinitionId.getTenantName(),
+								storletDefinitionId.getContainerName(),
+								storletDefinitionId.getObjectName());
 				// Fake cciclient for testing
-//				InputStream slDefinitionContentEncodedStream = FakeCCIClient
-//						.getObjectContentsAsStream("");
+				// InputStream slDefinitionContentEncodedStream = FakeCCIClient
+				// .getObjectContentsAsStream("");
 				Utils.extractJarContents(
 						Utils.decodeStream(slDefinitionContentEncodedStream),
 						workFolder.getAbsolutePath());
@@ -266,13 +273,13 @@ public class StorletWrapper extends ComponentDefinition {
 			}
 
 			// ------------get the data-----------------
-			 InputStream slInstanceContentEncodedStream = oClient
-			 .getObjectContentsAsStream(
-			 storletInstanceId.getTenantName(),
-			 storletInstanceId.getContainerName(),
-			 storletInstanceId.getObjectName());
-//			InputStream slInstanceContentEncodedStream = FakeCCIClient
-//					.getObjectContentsAsStream("");
+			InputStream slInstanceContentEncodedStream = oClient
+					.getObjectContentsAsStream(
+							storletInstanceId.getTenantName(),
+							storletInstanceId.getContainerName(),
+							storletInstanceId.getObjectName());
+			// InputStream slInstanceContentEncodedStream = FakeCCIClient
+			// .getObjectContentsAsStream("");
 			// IMPORTANT: Storlet files will overwrite Definition files
 			Utils.extractJarContents(
 					Utils.decodeStream(slInstanceContentEncodedStream),
@@ -294,11 +301,13 @@ public class StorletWrapper extends ComponentDefinition {
 			// method, slower
 			// Load storlet class from jar & activate it
 			// load constraints
-			logger.info("storlet class unziped: " + storletInstanceId.toString());
+			logger.info("storlet class unziped: "
+					+ storletInstanceId.toString());
 			Properties constraints = getConstraintsFromFile(workFolder);
-			if (constraints.get("time") != null){
+			if (constraints.get("time") != null) {
 				System.out.println(constraints.get("time"));
-				timeConstraint = Long.parseLong(constraints.get("time").toString());
+				timeConstraint = Long.parseLong(constraints.get("time")
+						.toString());
 			}
 			logger.info("storlet properties loaded: ");
 			long startTime = System.currentTimeMillis();
