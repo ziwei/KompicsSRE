@@ -53,11 +53,6 @@
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>eu.visioncloud.cci</groupId>
-			<artifactId>cciclient</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.6.1</version>
@@ -67,7 +62,16 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.6.1</version>
 		</dependency>
-
+		<dependency>
+			<groupId>gr.ntua.vision</groupId>
+			<artifactId>vismo-dispatch</artifactId>
+			<version>1.1.8</version>
+		</dependency>
+		<dependency>
+			<groupId>gr.ntua.vision</groupId>
+			<artifactId>vismo-notify</artifactId>
+			<version>1.1.8</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -145,6 +149,29 @@
 			<id>snapshots</id>
 			<name>Archiva Managed Snapshot Repository</name>
 			<url>http://10.0.0.1:8000/archiva/repository/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>ntua.releases</id>
+			<name>ntua releases repo</name>
+			<url>http://147.102.19.238:8090/archiva/repository/internal</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>ntua.snapshots</id>
+			<name>ntua snapshots repo</name>
+			<url>http://147.102.19.238:8090/archiva/repository/snapshots</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
