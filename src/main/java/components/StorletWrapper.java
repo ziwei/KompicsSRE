@@ -128,9 +128,15 @@ public class StorletWrapper extends ComponentDefinition {
 					dispatcher.newEvent().field("tenantID", slID.getTenantName()).field("containerID", slID.getContainerName())
 					.field("objectID", slID.getObjectName()).field("end_time", endTime).field("start_time", startTime)
 					.field("count", 1).field("storletType", "STORLET").send();
+					logger.info("Billing event \n{\n\t tenantID : " + slID.getTenantName() + "\n\t containerID : " + slID.getContainerName()
+							+ "\n\t objectID : " + slID.getObjectName() + "\n\t end_time : " + endTime + "\n\t start_time : "
+							+ startTime + "\n\t count : 1" + "\n\t storletType : STORLET" + "\n}");
 					dispatcher.newEvent().field("storletId", trigger.getSlID()).field("end_time", endTime)
 					.field("start_time", startTime).field("objectId", trigger.getEventModel().getObjectName())
 					.field("machineId", trigger.getEventModel().getPosition()).send();
+					logger.info("SLA event \n{\n\t storletId : " + trigger.getSlID() + "\n\t end_time : " 
+							+ endTime + "\n\t start_time : " + startTime + "\n\t objectId : " + trigger.getEventModel().getObjectName()
+							+ "\n\t machineId : " + trigger.getEventModel().getPosition() + "\n}");
 				}
 				else
 					logger.info("no valid triggers");
@@ -171,9 +177,15 @@ public class StorletWrapper extends ComponentDefinition {
 				dispatcher.newEvent().field("tenantID", slID.getTenantName()).field("containerID", slID.getContainerName())
 				.field("objectID", slID.getObjectName()).field("end_time", endTime).field("start_time", startTime)
 				.field("count", 1).field("storletType", "STORLET").send();
+				logger.info("Billing event \n{\n\t tenantID : " + slID.getTenantName() + "\n\t containerID : " + slID.getContainerName()
+						+ "\n\t objectID : " + slID.getObjectName() + "\n\t end_time : " + endTime + "\n\t start_time : "
+						+ startTime + "\n\t count : 1" + "\n\t storletType : STORLET"+ "\n}");
 				dispatcher.newEvent().field("storletId", trigger.getSyncAct().getStorlet_name()).field("end_time", endTime)
 				.field("start_time", startTime).field("objectId", slID.getObjectName())
 				.field("machineId", SREConst.externalip).send();
+				logger.info("SLA event \n{\n\t storletId : " + trigger.getSyncAct().getStorlet_name() + "\n\t end_time : " 
+				+ endTime + "\n\t start_time : " + startTime + "\n\t objectId : " + slID.getObjectName() + "\n\t machineId : "
+				+ SREConst.externalip+ "\n}");
 				trigger(new ExecutionInfo("stop", trigger.getSyncAct()
 						.getStorlet_name(), "Sync"), exeStatus);
 
