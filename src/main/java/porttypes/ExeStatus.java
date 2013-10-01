@@ -1,3 +1,6 @@
+/*
+port for ExecutionInfo events, for SRE detect execution start and finish
+ */
 package porttypes;
 
 import events.ExecutionInfo;

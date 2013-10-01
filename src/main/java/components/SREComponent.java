@@ -1,3 +1,7 @@
+/*
+SRE Component, handles all events from the Jetty Web Server,
+create storlet wrapper components
+ */
 package components;
 
 import java.io.File;
@@ -66,7 +70,7 @@ public class SREComponent extends ComponentDefinition {
 		}
 
 	};
-
+	// detect the execution start and finish, for setup timers
 	Handler<ExecutionInfo> handlerExeEvent = new Handler<ExecutionInfo>() {
 
 		@Override
@@ -83,7 +87,7 @@ public class SREComponent extends ComponentDefinition {
 		}
 
 	};
-
+	// delete cached storlets when storlet class loading failed
 	Handler<StorletLoadingFault> faultH = new Handler<StorletLoadingFault>() {
 		public void handle(StorletLoadingFault fault) {
 			// System.out.println(fault.getSlID());
@@ -97,7 +101,7 @@ public class SREComponent extends ComponentDefinition {
 			}
 		}
 	};
-
+	//handling async triggers
 	Handler<AsyncTrigger> slTriggerH = new Handler<AsyncTrigger>() {
 		public void handle(AsyncTrigger slEvent) {
 			logger.info("received an Async Trigger with slID: "
@@ -128,6 +132,7 @@ public class SREComponent extends ComponentDefinition {
 			logger.info("Async Trigger Event processed");
 		}
 	};
+	//handling sync triggers
 	Handler<SyncTrigger> slSyncH = new Handler<SyncTrigger>() {
 		public void handle(SyncTrigger slEvent) {
 			SyncSLActivation syncAct = slEvent.getSyncAct();
@@ -151,6 +156,7 @@ public class SREComponent extends ComponentDefinition {
 			logger.info("Sync Trigger Event forwarded");
 		}
 	};
+	//handling deletion request
 	Handler<SlDelete> slDeleteH = new Handler<SlDelete>() {
 		public void handle(SlDelete slEvent) {
 			logger.info("received an Deletion Request for slID: "

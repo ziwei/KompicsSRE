@@ -1,3 +1,6 @@
+/*
+ * Main component for Kompics framework
+ */
 package vision.kompics;
 
 import java.io.IOException;

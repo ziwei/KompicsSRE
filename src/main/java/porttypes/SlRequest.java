@@ -1,3 +1,6 @@
+/*
+port for async trigger events, sync trigger events, deletion events
+ */
 package porttypes;
 
 import events.SlOperation;

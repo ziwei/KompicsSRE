@@ -1,3 +1,6 @@
+/*
+Container for sync trigger event body, same as old SRE
+ */
 package msgTypes;
 
 import java.io.Serializable;

@@ -1,3 +1,6 @@
+/*
+ components hold storlet instances, one wrapper per storlet
+ */
 package components;
 
 import java.io.File;
@@ -61,7 +64,7 @@ public class StorletWrapper extends ComponentDefinition {
 	// private static final JavaSysMon sysMon = new JavaSysMon();
 	// private static long startMem = sysMon.physical().getFreeBytes();
 	long timeConstraint = -1;
-
+	//initialize CCIClient
 	static {
 		String storageServiceUrl = SREConst.ccsURL;
 		if (SREConst.user != null && SREConst.tenant != null
@@ -82,23 +85,15 @@ public class StorletWrapper extends ComponentDefinition {
 		subscribe(slSyncTriggerH, slReq);
 
 	}
-
+	//load a storlet
 	private Handler<StorletInit> handleInit = new Handler<StorletInit>() {
 		public void handle(StorletInit init) {
-			// if (started == false){
-			// startMem = sysMon.physical().getFreeBytes();
-			// started = true;
-			// }
 			logger.info("Init phase, loading storlet with slID: "
 					+ init.getSlID());
 			storlet = loadStorlet(init.getSlID());
-
-			// logger.info("storlet with slID: "+init.getSlID()+" loaded");
-
-			// logAndIncreament();
 		}
 	};
-
+	//Async trigger a storlet, dispatch billing and SLA when execution complete
 	Handler<AsyncTrigger> slAsyncTriggerH = new Handler<AsyncTrigger>() {
 
 		public void handle(AsyncTrigger trigger) {
@@ -157,7 +152,7 @@ public class StorletWrapper extends ComponentDefinition {
 
 		}
 	};
-
+	//Sync trigger a storlet, dispatch billing and SLA when execution complete
 	Handler<SyncTrigger> slSyncTriggerH = new Handler<SyncTrigger>() {
 		public void handle(SyncTrigger trigger) {
 			// messages++;
@@ -207,7 +202,7 @@ public class StorletWrapper extends ComponentDefinition {
 
 		}
 	};
-
+	//Load a storlet, same as old SRE
 	private Storlet loadStorlet(String slID) {
 		Storlet storlet = null;
 		File workFolder = new File(SREConst.slFolderPath + File.separator
@@ -310,7 +305,7 @@ public class StorletWrapper extends ComponentDefinition {
 
 		return storlet;
 	}
-
+	//Read storlet constraints, currently only time constraint supported
 	private Properties getConstraintsFromFile(File workingDirectory) {
 		Properties params = new Properties();
 		FileInputStream fis;

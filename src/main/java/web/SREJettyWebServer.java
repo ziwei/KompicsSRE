@@ -1,15 +1,12 @@
+/*
+Jetty Web Server Component, establish connectors and filter out basic event types
+*/
 package web;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -32,7 +29,6 @@ import constant.SREConst;
 import porttypes.SlRequest;
 
 import eu.visioncloud.storlet.common.EventModel;
-import eu.visioncloud.storlet.common.Utils;
 import events.SlDelete;
 import events.SyncTrigger;
 import events.AsyncTrigger;
@@ -42,8 +38,6 @@ import se.sics.kompics.Handler;
 import se.sics.kompics.Kompics;
 import se.sics.kompics.Positive;
 import se.sics.kompics.web.Web;
-import se.sics.kompics.web.jetty.JettyWebServerConfiguration;
-import se.sics.kompics.web.jetty.JettyWebServerInit;
 
 public final class SREJettyWebServer extends ComponentDefinition {
 
